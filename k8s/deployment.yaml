@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kryxhub-backend-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kryxhub-backend-api
+  template:
+    metadata:
+      labels:
+        app: kryxhub-backend-api
+    spec:
+      containers:
+      - name: backend-api-container
+        image: kryxhub-services:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
