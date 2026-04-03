@@ -50,3 +50,6 @@ logs/
 ### Local Docker/Database Volumes ###
 postgres-data/
 pgdata/
+
+### Security ###
+src/main/resources/certs/

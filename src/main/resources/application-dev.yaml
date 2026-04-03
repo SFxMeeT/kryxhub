@@ -17,3 +17,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  security:
+    user:
+      name: xdibu
+      password: sn
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
