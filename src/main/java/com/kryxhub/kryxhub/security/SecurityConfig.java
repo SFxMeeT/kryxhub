@@ -32,14 +32,14 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll();
+                    auth.requestMatchers("/api/auth/login", "/api/auth/refresh", "/public/health-check", "/utils/password").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth2 -> {
                     oauth2.jwt(withDefaults());
                 })
-                .addFilterBefore(jwtBlacklistFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(jwtBlacklistFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 

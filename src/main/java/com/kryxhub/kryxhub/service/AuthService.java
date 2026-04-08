@@ -79,7 +79,7 @@ public class AuthService {
             tokenBlacklistService.addToBlacklist(jwt.getTokenValue(), remainingTime);
         }
 
-        refreshTokenService.deleteByUserId(userRepository.findByEmail(jwt.getSubject()).get());
+        userRepository.findByEmail(jwt.getSubject()).ifPresent(refreshTokenService::deleteByUserId);
         return ResponseCookie.from("refresh_jwt", "")
                 .httpOnly(true)
                 .secure(true)
