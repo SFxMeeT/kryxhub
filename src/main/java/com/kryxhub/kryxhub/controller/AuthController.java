@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -24,7 +24,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("login")
     public ResponseEntity<AuthAccessResponse> login(@RequestBody AuthRequest authRequest) {
 
         AuthCookieAccess login = authService.login(authRequest);
@@ -34,14 +34,14 @@ public class AuthController {
                 .body(login.getAuthAccessResponse());
     }
 
-    @PostMapping("/auth/logout")
+    @PostMapping("logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, authService.logout(jwt).toString())
                 .body("User logged out!");
     }
 
-    @PostMapping("/auth/refresh")
+    @PostMapping("refresh")
     public ResponseEntity<AuthAccessResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         AuthCookieAccess refresh = authService.refreshToken(request);
@@ -49,5 +49,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, refresh.getCookie().toString())
                 .body(refresh.getAuthAccessResponse());
+    }
+
+    @PostMapping("/social/google")
+    public ResponseEntity<AuthAccessResponse> handleGoogleLogin(@RequestBody SocialLoginRequest request) {
+        AuthCookieAccess authGoogle = authService.authGoogleLogin(request.getToken());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, authGoogle.getCookie().toString())
+                .body(authGoogle.getAuthAccessResponse());
+    }
+
+    @PostMapping("/social/discord")
+    public ResponseEntity<AuthAccessResponse> handleDiscordLogin(@RequestBody SocialLoginRequest request) {
+        AuthCookieAccess authDiscord = authService.authDiscordLogin(request.getCode());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, authDiscord.getCookie().toString())
+                .body(authDiscord.getAuthAccessResponse());
     }
 }

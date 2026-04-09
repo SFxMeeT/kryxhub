@@ -24,9 +24,15 @@ spring:
       port: 6379
 
   security:
-    user:
-      name: xdibu
-      password: sn
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 664910110649-2ovuslrloghb8f98ijjqbb5icnrekg6o.apps.googleusercontent.com
+          discord:
+            client-id: "1491482173214167241"
+            client-secret: "6qPRXx8t95vPc-_NUua-fxvAbWy1w1QF"
+            redirect-uri: "http://localhost:8080/login.html"
 
 rsa:
   private-key: classpath:certs/private.pem

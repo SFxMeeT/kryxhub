@@ -32,7 +32,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/auth/login", "/api/auth/refresh", "/public/health-check", "/utils/password").permitAll();
+                    auth.requestMatchers("/api/auth/login", "/api/auth/refresh", "/public/health-check", "/utils/password", "/login.html", "/api/auth/social/google", "/api/auth/social/discord", "/public/config/google-client-id").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
