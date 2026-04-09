@@ -23,6 +23,9 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified = false;
+
     @Column(name = "password_hash", length = 255)
     private String passwordHash;
 
@@ -128,6 +131,14 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        isEmailVerified = emailVerified;
     }
 
     public String getPasswordHash() {
@@ -244,6 +255,10 @@ public class UserEntity {
 
     public OffsetDateTime getDeletionRequestedAt() {
         return deletionRequestedAt;
+    }
+
+    public void setDeletionRequestedAt(OffsetDateTime deletionRequestedAt) {
+        this.deletionRequestedAt = deletionRequestedAt;
     }
 
     public List<CampaignEntity> getCampaigns() {

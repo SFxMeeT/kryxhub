@@ -106,6 +106,10 @@ public class LinkedSocialAccountEntity {
         return verifiedAt;
     }
 
+    public void setVerifiedAt(OffsetDateTime verifiedAt) {
+        this.verifiedAt = verifiedAt;
+    }
+
     public SocialAccountStatus getStatus() {
         return status;
     }
@@ -118,4 +122,7 @@ public class LinkedSocialAccountEntity {
         return createdAt;
     }
 
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

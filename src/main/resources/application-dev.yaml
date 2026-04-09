@@ -34,6 +34,19 @@ spring:
             client-secret: "6qPRXx8t95vPc-_NUua-fxvAbWy1w1QF"
             redirect-uri: "http://localhost:8080/login.html"
 
+youtube:
+  api-key: "AIzaSyCyy4pfZC2AXmHQ88HtV6Zk_FXgEZpRcQU"
+
+vimeo:
+  access-token: "6a53122fe02a07e3a90b529ae49eb33d"
+
+twitch:
+  client-id: "qufoyrl5lbs2umhdrhxv2e3sx2z4no"
+  client-secret: "qd0hb6ynu3t9rri308viokoik4u2fc"
+
+resend:
+    api-key: "re_BpGemCBZ_MMNTuZHot9344oB3gpoWZatr"
+
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem

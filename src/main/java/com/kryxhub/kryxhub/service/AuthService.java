@@ -10,6 +10,7 @@ import com.kryxhub.kryxhub.entity.UserEntity;
 import com.kryxhub.kryxhub.enums.AccountStatus;
 import com.kryxhub.kryxhub.enums.Role;
 import com.kryxhub.kryxhub.enums.TokenType;
+import com.kryxhub.kryxhub.exception.Requires2faException;
 import com.kryxhub.kryxhub.repository.UserRepository;
 import com.kryxhub.kryxhub.security.AuthUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,13 +40,17 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenBlacklistService tokenBlacklistService;
     private final RestTemplate restTemplate;
+    private final OtpService otpService;
+    private final EmailService emailService;
 
     public AuthService(AuthenticationManager authenticationManager,
                        JwtTokenService jwtTokenService,
                        RefreshTokenService refreshTokenService,
                        AuthUserDetailsService userDetailsService,
                        UserRepository userRepository,
-                       TokenBlacklistService tokenBlacklistService) {
+                       TokenBlacklistService tokenBlacklistService,
+                       OtpService otpService,
+                       EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
         this.refreshTokenService = refreshTokenService;
@@ -53,6 +58,8 @@ public class AuthService {
         this.userRepository = userRepository;
         this.tokenBlacklistService = tokenBlacklistService;
         this.restTemplate = new RestTemplate();
+        this.otpService = otpService;
+        this.emailService = emailService;
     }
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -67,36 +74,56 @@ public class AuthService {
     @Value("${spring.security.oauth2.client.registration.discord.redirect-uri}")
     private String discordRedirectUri;
 
-    public AuthResponse authenticate(AuthRequest authRequest) {
+    public AuthCookieAccess login(AuthRequest authRequest) {
         var loginToken = new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(loginToken);
 
-        String accessToken = jwtTokenService.generateToken(authentication);
-        Long expiresAt = jwtTokenService.extractExpirationTime(accessToken);
+        UserEntity user = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
-        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(authRequest.getEmail());
+        if (user.getIs2faEnabled() != null && user.getIs2faEnabled()) {
+            String otp = otpService.generateAndStoreOtp(user.getEmail(), "2FA_LOGIN");
+            emailService.sendVerificationOtp(user.getEmail(), otp);
 
-        return new AuthResponse(accessToken, refreshToken.getToken(), authentication.getName(), expiresAt);
+            throw new Requires2faException("2FA_REQUIRED");
+        }
+
+        return generateTokensForUser(authentication, authRequest.getEmail());
     }
 
-    public AuthCookieAccess login(AuthRequest authRequest) {
+    public AuthCookieAccess verify2faLogin(Verify2faLoginRequest request) {
 
-        AuthResponse authenticate = authenticate(authRequest);
+        boolean isValid = otpService.validateOtp(request.getEmail(), "2FA_LOGIN", request.getOtpCode());
+
+        if (!isValid) {
+            throw new RuntimeException("Invalid or expired login code.");
+        }
+
+        UserEntity user = userRepository.findByEmail(request.getEmail()).get();
+
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
+
+        return generateTokensForUser(authentication, user.getEmail());
+    }
+
+    private AuthCookieAccess generateTokensForUser(Authentication authentication, String email) {
+        String accessToken = jwtTokenService.generateToken(authentication);
+        Long expiresAt = jwtTokenService.extractExpirationTime(accessToken);
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(email);
 
         AuthAccessResponse authAccessResponse = new AuthAccessResponse(
-                authenticate.getAccessToken(),
-                authenticate.getEmail(),
-                authenticate.getExpiresAt(),
-                TokenType.ACCESS_TOKEN
+                accessToken, email, expiresAt, TokenType.ACCESS_TOKEN
         );
 
-        return new AuthCookieAccess(ResponseCookie.from("refresh_jwt", authenticate.getRefreshToken())
-                .httpOnly(true)
-                .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(7 * 24 * 60 * 60)
-                .build(),
-                authAccessResponse);
+        return new AuthCookieAccess(
+                ResponseCookie.from("refresh_jwt", refreshToken.getToken())
+                        .httpOnly(true)
+                        .secure(true)
+                        .path("/api/auth/refresh")
+                        .maxAge(7 * 24 * 60 * 60)
+                        .build(),
+                authAccessResponse
+        );
     }
 
     public ResponseCookie logout(Jwt jwt) {
