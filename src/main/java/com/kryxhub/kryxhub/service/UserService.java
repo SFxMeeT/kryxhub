@@ -53,6 +53,8 @@ public class UserService {
         user.setRole(Role.CREATOR);
         user.setAccountStatus(AccountStatus.ACTIVE);
 
+        user = userRepository.save(user);
+
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user.getEmail(), null, authorities);
