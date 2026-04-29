@@ -291,6 +291,7 @@ public class AuthService {
                 ResponseCookie.from("refresh_jwt", refreshToken.getToken())
                         .httpOnly(true)
                         .secure(true)
+                        .sameSite("None")
                         .path("/api/auth/refresh")
                         .maxAge(7 * 24 * 60 * 60)
                         .build(),
