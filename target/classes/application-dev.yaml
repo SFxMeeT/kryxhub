@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: kryxhub
+  datasource:
+    url: jdbc:postgresql://ep-noisy-fog-ambvubsa.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_Uirfg4G8Neyx
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  data:
+    redis:
+      host: redis-13917.crce276.ap-south-1-3.ec2.cloud.redislabs.com
+      port: 13917
+      username: default
+      password: sxuX8Gl7LfiZmSPUcQoRjxpMAeYngIBZ
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 664910110649-2ovuslrloghb8f98ijjqbb5icnrekg6o.apps.googleusercontent.com
+          discord:
+            client-id: "1491482173214167241"
+            client-secret: "6qPRXx8t95vPc-_NUua-fxvAbWy1w1QF"
+            redirect-uri: "http://localhost:8080/login.html"
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.springframework.web: TRACE
+
+youtube:
+  api-key: "AIzaSyCyy4pfZC2AXmHQ88HtV6Zk_FXgEZpRcQU"
+
+vimeo:
+  access-token: "6a53122fe02a07e3a90b529ae49eb33d"
+
+twitch:
+  client-id: "qufoyrl5lbs2umhdrhxv2e3sx2z4no"
+  client-secret: "qd0hb6ynu3t9rri308viokoik4u2fc"
+
+resend:
+    api-key: "re_BpGemCBZ_MMNTuZHot9344oB3gpoWZatr"
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem

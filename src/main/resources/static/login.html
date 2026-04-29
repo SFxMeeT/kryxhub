@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KryxHub Social Login</title>
+    <style>
+        body {
+            font-family: suisse, suisse Fallback, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .login-box {
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 250px;
+            height: 40px;
+            background-color: #ffffff;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            text-decoration: none;
+            box-sizing: border-box;
+            padding: 0 12px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .social-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+        .social-btn:active {
+            background-color: #eeeeee;
+        }
+        .social-btn svg {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            left: 12px;
+        }
+        .social-btn span {
+            font-family: "Google Sans", arial, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3c4043;
+            letter-spacing: 0.25px;
+        }
+
+        #status { margin-top: 20px; font-family: monospace; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Login to KryxHub</h2>
+
+    <div id="googleButtonDiv"></div>
+
+    <a href="https://discord.com/oauth2/authorize?client_id=1491482173214167241&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin.html&scope=identify+email" class="social-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
+            <path fill="#5865F2" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/>
+        </svg>
+        <span>Continue with Discord</span>
+    </a>
+
+    <div id="status">Waiting for login...</div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+
+    window.onload = async function () {
+
+        const response = await fetch('/public/config/google-client-id');
+        const clientId = await response.text();
+
+        google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleLogin
+        });
+
+        google.accounts.id.renderButton(
+            document.getElementById("googleButtonDiv"),
+            { theme: "outline", size: "large", text: "continue_with" }
+        );
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const discordCode = urlParams.get('code');
+
+        if (discordCode) {
+            document.getElementById("status").innerText = "Caught Discord Code! Sending to Backend...";
+            handleDiscordLogin(discordCode);
+        }
+    };
+
+    function handleGoogleLogin(googleResponse) {
+        const idToken = googleResponse.credential;
+        document.getElementById("status").innerText = "Sending Google Token to Backend...";
+
+        fetch('/api/auth/social/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: idToken })
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("status").innerText = "Logged into KryxHub with Google!";
+                console.log(data);
+            });
+    }
+
+    function handleDiscordLogin(code) {
+        fetch('/api/auth/social/discord', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code })
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("status").innerText = "Logged into KryxHub with Discord!";
+                console.log(data);
+                window.history.replaceState({}, document.title, "/login.html");
+            })
+            .catch(err => {
+                document.getElementById("status").innerText = "Discord Login Failed.";
+                console.error(err);
+            });
+    }
+</script>
+</body>
+</html>
