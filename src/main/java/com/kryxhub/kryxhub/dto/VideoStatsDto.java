@@ -16,4 +16,5 @@ public class VideoStatsDto {
     public String getVideoTitle() { return videoTitle; }
     public Integer getViewCount() { return viewCount; }
     public OffsetDateTime getUploadedAt() { return uploadedAt; }
+    
 }
