@@ -44,4 +44,28 @@ public class SubmissionController {
             ));
         }
     }
+
+    @PutMapping("/{submissionId}/review")
+    public ResponseEntity<?> reviewSubmission(
+            @PathVariable UUID submissionId,
+            @RequestBody ReviewSubmissionRequest request,
+            Authentication authentication) {
+        
+        String funderEmail = authentication.getName();
+
+        try {
+            SubmissionEntity reviewedSubmission = submissionService.reviewSubmission(submissionId, request, funderEmail);
+            
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Submission has been " + reviewedSubmission.getStatus(),
+                    "submissionId", reviewedSubmission.getId()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }

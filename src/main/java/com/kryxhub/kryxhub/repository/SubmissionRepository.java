@@ -10,5 +10,7 @@ import java.util.UUID;
 public interface SubmissionRepository extends JpaRepository<SubmissionEntity, UUID> {
 
     boolean existsByVideoUrl(String videoUrl);
+
+    List<SubmissionEntity> findByCampaignId(UUID campaignId);
     
 }
