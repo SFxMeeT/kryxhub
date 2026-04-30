@@ -81,12 +81,12 @@ public class CampaignQuestionEntity {
         this.questionType = questionType;
     }
 
-    public Boolean getRequired() {
+    public Boolean getIsRequired() {
         return isRequired;
     }
 
-    public void setRequired(Boolean required) {
-        isRequired = required;
+    public void setIsRequired(Boolean isRequired) {
+        this.isRequired = isRequired;
     }
 
     public Integer getDisplayOrder() {
@@ -97,11 +97,15 @@ public class CampaignQuestionEntity {
         this.displayOrder = displayOrder;
     }
 
+    public List<SubmissionAnswerEntity> getAnswers() {
+        return answers;
+    }
+
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public List<SubmissionAnswerEntity> getAnswers() {
-        return answers;
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

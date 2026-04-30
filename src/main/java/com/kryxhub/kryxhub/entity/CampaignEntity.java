@@ -197,8 +197,16 @@ public class CampaignEntity {
         return createdAt;
     }
 
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public OffsetDateTime getFundedAt() {
         return fundedAt;
+    }
+
+    public void setFundedAt(OffsetDateTime fundedAt) {
+        this.fundedAt = fundedAt;
     }
 
     public List<CampaignPlatformEntity> getPlatforms() {
