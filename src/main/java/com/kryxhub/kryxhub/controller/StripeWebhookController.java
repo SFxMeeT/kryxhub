@@ -44,20 +44,20 @@ public class StripeWebhookController {
         if ("checkout.session.completed".equals(event.getType())) {
             
             EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-            Session session = null;
+            com.stripe.model.checkout.Session stripeSession = null;
 
             try {
                 if (dataObjectDeserializer.getObject().isPresent()) {
-                    session = (Session) dataObjectDeserializer.getObject().get();
-                } else {!
-                    session = (Session) dataObjectDeserializer.deserializeUnsafe();
+                    stripeSession = (com.stripe.model.checkout.Session) dataObjectDeserializer.getObject().get();
+                } else {
+                    stripeSession = (com.stripe.model.checkout.Session) dataObjectDeserializer.deserializeUnsafe();
                 }
             } catch (com.stripe.exception.EventDataObjectDeserializationException e) {
                 System.err.println("Webhook deserialization failed: " + e.getMessage());
             }
             
-            if (session != null && session.getMetadata() != null) {
-                String campaignId = session.getMetadata().get("campaign_id");
+            if (stripeSession != null && stripeSession.getMetadata() != null) {
+                String campaignId = stripeSession.getMetadata().get("campaign_id");
                 
                 if (campaignId != null) {
                     System.out.println("Webhook caught for Campaign ID: " + campaignId);
