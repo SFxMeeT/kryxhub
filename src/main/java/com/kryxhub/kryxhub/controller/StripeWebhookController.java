@@ -44,12 +44,16 @@ public class StripeWebhookController {
         if ("checkout.session.completed".equals(event.getType())) {
             
             EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-            Session session;
+            Session session = null;
 
-            if (dataObjectDeserializer.getObject().isPresent()) {
-                session = (Session) dataObjectDeserializer.getObject().get();
-            } else {
-                session = (Session) dataObjectDeserializer.deserializeUnsafe();
+            try {
+                if (dataObjectDeserializer.getObject().isPresent()) {
+                    session = (Session) dataObjectDeserializer.getObject().get();
+                } else {!
+                    session = (Session) dataObjectDeserializer.deserializeUnsafe();
+                }
+            } catch (com.stripe.exception.EventDataObjectDeserializationException e) {
+                System.err.println("⚠️ Webhook deserialization failed: " + e.getMessage());
             }
             
             if (session != null && session.getMetadata() != null) {
