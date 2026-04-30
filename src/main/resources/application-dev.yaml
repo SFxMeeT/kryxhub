@@ -45,6 +45,8 @@ logging:
 stripe:
   api:
     key: ${STRIPE_TEST_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 youtube:
   api-key: ${YOUTUBE_API_KEY}
