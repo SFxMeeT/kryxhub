@@ -169,7 +169,7 @@ public class SubmissionEntity {
     }
 
     public void setReviewedAt(OffsetDateTime reviewedAt) {
-        this.reviewedAt = reviewedAt
+        this.reviewedAt = reviewedAt;
     }
 
     public List<SubmissionAnswerEntity> getAnswers() {
