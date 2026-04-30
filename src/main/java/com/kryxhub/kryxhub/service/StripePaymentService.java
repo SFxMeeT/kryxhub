@@ -8,9 +8,12 @@ import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 @Service
 public class StripePaymentService {
@@ -70,5 +73,20 @@ public class StripePaymentService {
 
         Session session = Session.create(params);
         return session.getUrl();
+    }
+
+    @Transactional
+    public void fulfillCampaignPayment(String campaignIdStr) {
+        UUID campaignId = UUID.fromString(campaignIdStr);
+        
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found for webhook processing"));
+
+        campaign.setStatus("ACTIVE"); 
+        campaign.setFundedAt(OffsetDateTime.now());
+        
+        campaignRepository.save(campaign);
+        
+        System.out.println("🎉 SUCCESS: Campaign '" + campaign.getTitle() + "' is now FULLY FUNDED AND ACTIVE!");
     }
 }
