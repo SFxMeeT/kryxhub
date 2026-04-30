@@ -32,6 +32,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/webhooks/**").permitAll()
                     auth.requestMatchers("/api/auth/**", "/public/**", "/utils/password", "/login.html").permitAll();
                     auth.anyRequest().authenticated();
                 })
