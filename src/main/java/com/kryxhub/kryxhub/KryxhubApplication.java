@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableScheduling
 public class KryxhubApplication {
 
 	public static void main(String[] args) {
