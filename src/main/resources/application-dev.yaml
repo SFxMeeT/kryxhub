@@ -41,6 +41,11 @@ logging:
     org.hibernate.SQL: DEBUG
     org.springframework.web: TRACE
 
+
+stripe:
+  api:
+    key: ${STRIPE_TEST_KEY}
+
 youtube:
   api-key: ${YOUTUBE_API_KEY}
 
