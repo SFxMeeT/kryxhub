@@ -81,12 +81,12 @@ public class CampaignQuestionEntity {
         this.questionType = questionType;
     }
 
-    public Boolean getRequired() {
+    public Boolean getIsRequired() {
         return isRequired;
     }
 
-    public void setRequired(Boolean required) {
-        isRequired = required;
+    public void setIsRequired(Boolean isRequired) {
+        this.isRequired = isRequired;
     }
 
     public Integer getDisplayOrder() {
