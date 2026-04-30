@@ -8,4 +8,7 @@ import java.util.UUID;
 
 @Repository
 public interface SubmissionRepository extends JpaRepository<SubmissionEntity, UUID> {
+
+    boolean existsByVideoUrl(String videoUrl);
+    
 }

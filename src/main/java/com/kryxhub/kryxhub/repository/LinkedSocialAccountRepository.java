@@ -8,4 +8,7 @@ import java.util.UUID;
 
 @Repository
 public interface LinkedSocialAccountRepository extends JpaRepository<LinkedSocialAccountEntity, UUID> {
+
+    boolean existsByUserAndPlatformAndVerified(UserEntity user, Platforms platform, Boolean verified);
+
 }
