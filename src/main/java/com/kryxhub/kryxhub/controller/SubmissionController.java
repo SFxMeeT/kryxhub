@@ -6,8 +6,10 @@ import com.kryxhub.kryxhub.service.SubmissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.kryxhub.kryxhub.dto.ReviewSubmissionRequest;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/submissions")
