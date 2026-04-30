@@ -44,14 +44,22 @@ public class StripeWebhookController {
         if ("checkout.session.completed".equals(event.getType())) {
             
             EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-            
+            Session session;
+
             if (dataObjectDeserializer.getObject().isPresent()) {
-                Session session = (Session) dataObjectDeserializer.getObject().get();
-                
+                session = (Session) dataObjectDeserializer.getObject().get();
+            } else {
+                session = (Session) dataObjectDeserializer.deserializeUnsafe();
+            }
+            
+            if (session != null && session.getMetadata() != null) {
                 String campaignId = session.getMetadata().get("campaign_id");
                 
                 if (campaignId != null) {
+                    System.out.println("✅ Webhook caught for Campaign ID: " + campaignId);
                     paymentService.fulfillCampaignPayment(campaignId);
+                } else {
+                    System.err.println("⚠️ Webhook caught, but no campaign_id was found in metadata.");
                 }
             }
         }
