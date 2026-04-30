@@ -71,8 +71,6 @@ public class SubmissionService {
         submission.setEstimatedPayout(BigDecimal.ZERO);
         
         submission.setStatus(campaign.getRequiresApplication() ? SubmissionStatus.PENDING : SubmissionStatus.APPROVED);
-        
-        submission.setSubmittedAt(OffsetDateTime.now());
 
         submission.setVideoTitle("My Awesome Submission"); 
 
