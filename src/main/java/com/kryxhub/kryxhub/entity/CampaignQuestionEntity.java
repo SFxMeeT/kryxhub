@@ -97,11 +97,15 @@ public class CampaignQuestionEntity {
         this.displayOrder = displayOrder;
     }
 
+    public List<SubmissionAnswerEntity> getAnswers() {
+        return answers;
+    }
+
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public List<SubmissionAnswerEntity> getAnswers() {
-        return answers;
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
