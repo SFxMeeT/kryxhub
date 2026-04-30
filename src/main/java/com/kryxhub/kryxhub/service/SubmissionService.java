@@ -1,16 +1,19 @@
 package com.kryxhub.kryxhub.service;
 
 import com.kryxhub.kryxhub.dto.SubmitVideoRequest;
+import com.kryxhub.kryxhub.dto.VideoStatsDto;
 import com.kryxhub.kryxhub.entity.*;
 import com.kryxhub.kryxhub.enums.Platforms;
 import com.kryxhub.kryxhub.enums.SubmissionStatus;
 import com.kryxhub.kryxhub.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.kryxhub.kryxhub.dto.ReviewSubmissionRequest;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 public class SubmissionService {
@@ -20,17 +23,20 @@ public class SubmissionService {
     private final UserRepository userRepository;
     private final LinkedSocialAccountRepository linkedAccountRepository;
     private final CampaignQuestionRepository questionRepository;
+    private final ExternalApiRouter apiRouter;
 
     public SubmissionService(SubmissionRepository submissionRepository, 
                              CampaignRepository campaignRepository, 
                              UserRepository userRepository, 
                              LinkedSocialAccountRepository linkedAccountRepository,
-                             CampaignQuestionRepository questionRepository) {
+                             CampaignQuestionRepository questionRepository,
+                             ExternalApiRouter apiRouter) {
         this.submissionRepository = submissionRepository;
         this.campaignRepository = campaignRepository;
         this.userRepository = userRepository;
         this.linkedAccountRepository = linkedAccountRepository;
         this.questionRepository = questionRepository;
+        this.apiRouter = apiRouter;
     }
 
     @Transactional
@@ -42,7 +48,7 @@ public class SubmissionService {
         CampaignEntity campaign = campaignRepository.findById(request.getCampaignId())
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));
 
-                boolean hasVerifiedAccount = linkedAccountRepository.existsByUserAndPlatformAndVerified(
+        boolean hasVerifiedAccount = linkedAccountRepository.existsByUserAndPlatformAndIsVerified(
                 creator, request.getPlatformName(), true);
         
         if (!hasVerifiedAccount) {
@@ -53,11 +59,11 @@ public class SubmissionService {
             throw new RuntimeException("This video has already been submitted to KryxHub.");
         }
 
-        OffsetDateTime simulatedUploadTime = OffsetDateTime.now().minusMinutes(5); 
-        
-        long minutesSinceUpload = ChronoUnit.MINUTES.between(simulatedUploadTime, OffsetDateTime.now());
+        VideoStatsDto videoStats = apiRouter.getStats(request.getPlatformName(), request.getVideoUrl());
+
+        long minutesSinceUpload = ChronoUnit.MINUTES.between(videoStats.getUploadedAt(), OffsetDateTime.now());
         if (minutesSinceUpload > 30) {
-            throw new RuntimeException("Video is too old! Must be submitted within 30 minutes of uploading.");
+            throw new RuntimeException("Video is too old! Must be submitted within 30 minutes of uploading. (Uploaded " + minutesSinceUpload + " mins ago).");
         }
 
         SubmissionEntity submission = new SubmissionEntity();
@@ -66,15 +72,13 @@ public class SubmissionService {
         submission.setVideoUrl(request.getVideoUrl());
         submission.setPlatformName(request.getPlatformName());
 
+        submission.setVideoTitle(videoStats.getVideoTitle()); 
+        
         submission.setCurrentViews(0);
         submission.setTotalEarned(BigDecimal.ZERO);
         submission.setEstimatedPayout(BigDecimal.ZERO);
         
         submission.setStatus(campaign.getRequiresApplication() ? SubmissionStatus.PENDING : SubmissionStatus.APPROVED);
-        
-        submission.setSubmittedAt(OffsetDateTime.now());
-
-        submission.setVideoTitle("My Awesome Submission"); 
 
         if (request.getAnswers() != null) {
             for (SubmitVideoRequest.AnswerDto answerDto : request.getAnswers()) {
@@ -90,6 +94,34 @@ public class SubmissionService {
                 submission.getAnswers().add(answerEntity);
             }
         }
+
+        return submissionRepository.save(submission);
+    }
+
+    @Transactional
+    public SubmissionEntity reviewSubmission(UUID submissionId, ReviewSubmissionRequest request, String funderEmail) {
+        
+
+        SubmissionEntity submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+        String actualFunderEmail = submission.getCampaign().getFunder().getEmail();
+        if (!actualFunderEmail.equals(funderEmail)) {
+            throw new RuntimeException("UNAUTHORIZED: You do not have permission to review submissions for this campaign.");
+        }
+
+        if (submission.getStatus() != SubmissionStatus.PENDING) {
+            throw new RuntimeException("This submission has already been " + submission.getStatus());
+        }
+
+        if (request.getIsApproved()) {
+            submission.setStatus(SubmissionStatus.APPROVED);
+        } else {
+            submission.setStatus(SubmissionStatus.REJECTED);
+        }
+
+        submission.setFunderNotes(request.getFunderNotes());
+        submission.setReviewedAt(OffsetDateTime.now());
 
         return submissionRepository.save(submission);
     }

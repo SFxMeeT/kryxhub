@@ -168,6 +168,10 @@ public class SubmissionEntity {
         return reviewedAt;
     }
 
+    public void setReviewedAt(OffsetDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
+    }
+
     public List<SubmissionAnswerEntity> getAnswers() {
         return answers;
     }
