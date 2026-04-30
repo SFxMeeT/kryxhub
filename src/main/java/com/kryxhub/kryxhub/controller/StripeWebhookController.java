@@ -34,10 +34,10 @@ public class StripeWebhookController {
         try {
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
         } catch (SignatureVerificationException e) {
-            System.err.println("⚠️ Webhook security alert: Invalid signature!");
+            System.err.println("Webhook security alert: Invalid signature!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         } catch (Exception e) {
-            System.err.println("⚠️ Webhook parsing error: " + e.getMessage());
+            System.err.println("Webhook parsing error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Payload error");
         }
 
@@ -53,17 +53,17 @@ public class StripeWebhookController {
                     session = (Session) dataObjectDeserializer.deserializeUnsafe();
                 }
             } catch (com.stripe.exception.EventDataObjectDeserializationException e) {
-                System.err.println("⚠️ Webhook deserialization failed: " + e.getMessage());
+                System.err.println("Webhook deserialization failed: " + e.getMessage());
             }
             
             if (session != null && session.getMetadata() != null) {
                 String campaignId = session.getMetadata().get("campaign_id");
                 
                 if (campaignId != null) {
-                    System.out.println("✅ Webhook caught for Campaign ID: " + campaignId);
+                    System.out.println("Webhook caught for Campaign ID: " + campaignId);
                     paymentService.fulfillCampaignPayment(campaignId);
                 } else {
-                    System.err.println("⚠️ Webhook caught, but no campaign_id was found in metadata.");
+                    System.err.println("Webhook caught, but no campaign_id was found in metadata.");
                 }
             }
         }
