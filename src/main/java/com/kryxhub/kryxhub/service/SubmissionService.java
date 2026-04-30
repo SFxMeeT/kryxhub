@@ -42,7 +42,7 @@ public class SubmissionService {
         CampaignEntity campaign = campaignRepository.findById(request.getCampaignId())
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));
 
-                boolean hasVerifiedAccount = linkedAccountRepository.existsByUserAndPlatformAndVerified(
+        boolean hasVerifiedAccount = linkedAccountRepository.existsByUserAndPlatformAndIsVerified(
                 creator, request.getPlatformName(), true);
         
         if (!hasVerifiedAccount) {
