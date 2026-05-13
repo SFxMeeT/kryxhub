@@ -1,4 +1,4 @@
-HELP.md<M-C-S-F3>
+HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -33,4 +33,5 @@ build/
 .vscode/
 
 ### Custom Secrets ###
+application-dev.yaml
 private.pem
