@@ -2,14 +2,14 @@ spring:
   application:
     name: kryxhub
   datasource:
-    url: jdbc:postgresql://ep-noisy-fog-ambvubsa.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require
-    username: neondb_owner
+    url: jdbc:postgresql://dpg-d7pi0vgsfn5c73dhjbkg-a:5432/kryxhub_db
+    username: kryxhub_db_user
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     show-sql: true
 
@@ -40,6 +40,13 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.springframework.web: TRACE
+
+
+stripe:
+  api:
+    key: ${STRIPE_TEST_KEY}
+  webhook:
+    secret: ${STRIPE_WEBHOOK_SECRET}
 
 youtube:
   api-key: ${YOUTUBE_API_KEY}
