@@ -11,6 +11,9 @@ import com.stripe.param.AccountLinkCreateParams;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.stripe.model.Transfer;
+import com.stripe.param.TransferCreateParams;
+import java.math.BigDecimal;
 
 @Service
 public class StripeConnectService {
@@ -65,5 +68,22 @@ public class StripeConnectService {
 
         AccountLink accountLink = AccountLink.create(params);
         return accountLink.getUrl();
+    }
+
+    public String transferToCreator(String connectedAccountId, BigDecimal amountNet) throws StripeException {
+        
+
+        long amountInCents = amountNet.multiply(new BigDecimal("100")).longValue();
+
+        TransferCreateParams params = TransferCreateParams.builder()
+                .setAmount(amountInCents)
+                .setCurrency("usd")
+                .setDestination(connectedAccountId)
+                .setDescription("KryxHub Campaign Payout")
+                .build();
+
+        Transfer transfer = Transfer.create(params);
+        
+        return transfer.getId(); 
     }
 }
