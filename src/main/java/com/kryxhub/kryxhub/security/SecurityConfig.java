@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/webhooks/**").permitAll();
-                    auth.requestMatchers("/api/auth/**", "/public/**", "/utils/password", "/login.html").permitAll();
+                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns", "/utils/password", "/login.html").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
