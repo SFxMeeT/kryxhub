@@ -7,6 +7,8 @@ import com.kryxhub.kryxhub.enums.AccountStatus;
 import com.kryxhub.kryxhub.enums.Role;
 import com.kryxhub.kryxhub.enums.TokenType;
 import com.kryxhub.kryxhub.repository.UserRepository;
+import com.kryxhub.kryxhub.dto.AdminUserDto;
+
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -202,5 +208,19 @@ public class UserService {
         UserEntity user = userRepository.findByEmail(email).get();
         user.setIs2faEnabled(true);
         userRepository.save(user);
+    }
+
+    public Page<AdminUserDto> getAllUsersForAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        
+        Page<UserEntity> users = userRepository.findAll(pageable);
+
+        return users.map(user -> new AdminUserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getStripeAccountId()
+        ));
     }
 }
