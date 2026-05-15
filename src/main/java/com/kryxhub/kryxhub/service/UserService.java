@@ -223,4 +223,23 @@ public class UserService {
                 user.getStripeAccountId()
         ));
     }
+
+    public String toggleUserSuspension(UUID userId) { 
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() == Role.ADMIN) {
+            throw new RuntimeException("Critical Error: Cannot suspend an Admin account.");
+        }
+
+        if (user.getAccountStatus() == AccountStatus.SUSPENDED) {
+            user.setAccountStatus(AccountStatus.ACTIVE);
+            userRepository.save(user);
+            return "User suspension lifted. Account is now ACTIVE.";
+        } else {
+            user.setAccountStatus(AccountStatus.SUSPENDED);
+            userRepository.save(user);
+            return "User has been SUSPENDED.";
+        }
+    }
 }
