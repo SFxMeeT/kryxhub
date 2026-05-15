@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 
 import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
 import com.kryxhub.kryxhub.dto.CampaignDiscoveryDto;
+import com.kryxhub.kryxhub.dto.AdminCampaignDto;
 
 import com.kryxhub.kryxhub.entity.CampaignEntity;
 import com.kryxhub.kryxhub.entity.CampaignFaqEntity;
@@ -136,6 +137,23 @@ public class CampaignService {
                 campaign.getTitle(),
                 campaign.getDescription(),
                 campaign.getFunder().getUsername(),
+                campaign.getBudgetRemaining()
+        ));
+    }
+
+    public Page<AdminCampaignDto> getAllCampaignsForAdmin(int page, int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<CampaignEntity> allCampaigns = campaignRepository.findAll(pageable);
+
+        return allCampaigns.map(campaign -> new AdminCampaignDto(
+                campaign.getId(),
+                campaign.getTitle(),
+                campaign.getFunder().getUsername(),
+                campaign.getFunder().getEmail(),
+                campaign.getStatus(), // If you are using an Enum here, you might need to add .name()
+                campaign.getTotalBudget(), // Assuming you have a totalBudget column, otherwise use budgetRemaining
                 campaign.getBudgetRemaining()
         ));
     }
