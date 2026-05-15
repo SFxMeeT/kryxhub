@@ -1,6 +1,7 @@
 package com.kryxhub.kryxhub.controller;
 
 import com.kryxhub.kryxhub.dto.AdminUserDto;
+import com.kryxhub.kryxhub.dto.UserActivityDto;
 import com.kryxhub.kryxhub.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,16 @@ public class AdminUserController {
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{userId}/activity")
+    public ResponseEntity<UserActivityDto> getUserActivity(@PathVariable java.util.UUID userId) {
+        try {
+            UserActivityDto activity = userService.getUserActivityTracker(userId);
+            return ResponseEntity.ok(activity);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.kryxhub.kryxhub.repository;
 
 import com.kryxhub.kryxhub.entity.SubmissionEntity;
+import com.kryxhub.kryxhub.entity.UserEntity;
 import com.kryxhub.kryxhub.enums.SubmissionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,7 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, UU
     List<SubmissionEntity> findByCampaignId(UUID campaignId);
 
     List<SubmissionEntity> findByStatus(SubmissionStatus status);
+
+    List<SubmissionEntity> findByCreator(UserEntity creator);
     
 }
