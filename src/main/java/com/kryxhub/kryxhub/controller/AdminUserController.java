@@ -24,4 +24,17 @@ public class AdminUserController {
         Page<AdminUserDto> userFeed = userService.getAllUsersForAdmin(page, size);
         return ResponseEntity.ok(userFeed);
     }
+    
+    @PutMapping("/{userId}/suspend")
+    public ResponseEntity<?> toggleSuspendUser(@PathVariable java.util.UUID userId) {
+        try {
+            String resultMessage = userService.toggleUserSuspension(userId);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "status", "success",
+                    "message", resultMessage
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }
