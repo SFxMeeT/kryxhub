@@ -22,9 +22,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtBlacklistFilter jwtBlacklistFilter;
+    private final AccountEnforcementFilter accountEnforcementFilter;
 
-    public SecurityConfig(JwtBlacklistFilter jwtBlacklistFilter) {
+    public SecurityConfig(JwtBlacklistFilter jwtBlacklistFilter, AccountEnforcementFilter accountEnforcementFilter) {
         this.jwtBlacklistFilter = jwtBlacklistFilter;
+        this.accountEnforcementFilter = accountEnforcementFilter;
     }
 
     @Bean
@@ -42,6 +44,7 @@ public class SecurityConfig {
                     oauth2.jwt(withDefaults());
                 })
                 .addFilterAfter(jwtBlacklistFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(accountEnforcementFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
