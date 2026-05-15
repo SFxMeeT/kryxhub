@@ -1,13 +1,18 @@
 package com.kryxhub.kryxhub.service;
 
 import com.kryxhub.kryxhub.dto.*;
+import com.kryxhub.kryxhub.entity.CampaignEntity;
 import com.kryxhub.kryxhub.entity.RefreshTokenEntity;
+import com.kryxhub.kryxhub.entity.SubmissionEntity;
 import com.kryxhub.kryxhub.entity.UserEntity;
 import com.kryxhub.kryxhub.enums.AccountStatus;
 import com.kryxhub.kryxhub.enums.Role;
 import com.kryxhub.kryxhub.enums.TokenType;
 import com.kryxhub.kryxhub.repository.UserRepository;
 import com.kryxhub.kryxhub.dto.AdminUserDto;
+import com.kryxhub.kryxhub.dto.UserActivityDto;
+import com.kryxhub.kryxhub.repository.SubmissionRepository;
+import com.kryxhub.kryxhub.repository.CampaignRepository;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.stream.Collectors;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,14 +41,18 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final OtpService otpService;
     private final EmailService emailService;
+    private final SubmissionRepository submissionRepository;
+    private final CampaignRepository campaignRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService, RefreshTokenService refreshTokenService, OtpService otpService, EmailService emailService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService, RefreshTokenService refreshTokenService, OtpService otpService, EmailService emailService, SubmissionRepository submissionRepository, CampaignRepository campaignRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
         this.refreshTokenService = refreshTokenService;
         this.otpService = otpService;
         this.emailService = emailService;
+        this.submissionRepository = submissionRepository;
+        this.campaignRepository = campaignRepository;
     }
 
     public AuthCookieAccess registerUser(RegisterRequest request) {
@@ -241,5 +251,36 @@ public class UserService {
             userRepository.save(user);
             return "User has been SUSPENDED.";
         }
+    }
+
+    public UserActivityDto getUserActivityTracker(UUID userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserActivityDto activityTracker = new UserActivityDto(user.getUsername(), user.getRole());
+
+        if (user.getRole() == Role.FUNDER) {
+            List<CampaignEntity> userCampaigns = campaignRepository.findByFunder(user);
+            
+            List<UserActivityDto.CampaignActivity> campaignDtos = userCampaigns.stream()
+                    .map(c -> new UserActivityDto.CampaignActivity(
+                            c.getId(), c.getTitle(), c.getStatus(), c.getBudgetRemaining()
+                    )).collect(Collectors.toList());
+                    
+            activityTracker.setCampaigns(campaignDtos);
+        } 
+
+        else if (user.getRole() == Role.CREATOR) {
+            List<SubmissionEntity> userSubmissions = submissionRepository.findByCreator(user);
+            
+            List<UserActivityDto.SubmissionActivity> submissionDtos = userSubmissions.stream()
+                    .map(s -> new UserActivityDto.SubmissionActivity(
+                            s.getId(), s.getVideoTitle(), s.getPlatformName().name(), s.getStatus().name(), s.getTotalEarned()
+                    )).collect(Collectors.toList());
+                    
+            activityTracker.setSubmissions(submissionDtos);
+        }
+
+        return activityTracker;
     }
 }
