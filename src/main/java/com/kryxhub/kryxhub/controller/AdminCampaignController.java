@@ -25,4 +25,32 @@ public class AdminCampaignController {
         Page<AdminCampaignDto> campaignFeed = campaignService.getAllCampaignsForAdmin(page, size);
         return ResponseEntity.ok(campaignFeed);
     }
+
+    @PutMapping("/{campaignId}/force-close")
+    public ResponseEntity<?> forceCloseCampaign(@PathVariable java.util.UUID campaignId) {
+        try {
+            String resultMessage = campaignService.forceCloseCampaign(campaignId);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "status", "success",
+                    "message", resultMessage
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{campaignId}/override-status")
+    public ResponseEntity<?> overrideCampaignStatus(
+            @PathVariable java.util.UUID campaignId, 
+            @RequestParam String newStatus) {
+        try {
+            String resultMessage = campaignService.overrideCampaignStatus(campaignId, newStatus);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "status", "success",
+                    "message", resultMessage
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }
