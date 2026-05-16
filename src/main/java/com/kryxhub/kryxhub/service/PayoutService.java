@@ -81,18 +81,15 @@ public class PayoutService {
         CampaignEntity campaign = submission.getCampaign();
 
         if (creator.getStripeAccountId() == null || creator.getStripeAccountId().isEmpty()) {
-            System.out.println("Skipping payout: Creator " + creator.getUsername() + " has no linked bank.");
-            return; 
+            throw new RuntimeException("Creator " + creator.getUsername() + " has no linked bank account.");
         }
 
         if (campaign.getBudgetRemaining().compareTo(newlyEarnedAmount) < 0) {
-            System.out.println("CRITICAL: Campaign out of budget for submission " + submission.getId());
-            return; 
+            throw new RuntimeException("Campaign out of budget. Needed: $" + newlyEarnedAmount + " but only has $" + campaign.getBudgetRemaining());
         }
 
-        if (!"ACTIVE".equals(campaign.getStatus())) {
-            System.out.println("Skipping payout: Campaign " + campaign.getId() + " is " + campaign.getStatus());
-            return;
+        if (!"ACTIVE".equals(campaign.getStatus().toString())) {
+            throw new RuntimeException("Campaign is " + campaign.getStatus() + ", not ACTIVE.");
         }
 
         try {
