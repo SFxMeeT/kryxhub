@@ -5,5 +5,6 @@ public enum CampaignStatus {
     ACTIVE,
     PAUSED,
     ENDED,
-    DELETED
+    DELETED,
+    FORCE_CLOSED
 }

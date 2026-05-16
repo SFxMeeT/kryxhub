@@ -152,9 +152,42 @@ public class CampaignService {
                 campaign.getTitle(),
                 campaign.getFunder().getUsername(),
                 campaign.getFunder().getEmail(),
-                campaign.getStatus(), // If you are using an Enum here, you might need to add .name()
-                campaign.getTotalBudget(), // Assuming you have a totalBudget column, otherwise use budgetRemaining
+                campaign.getStatus(),
+                campaign.getTotalBudget(),
                 campaign.getBudgetRemaining()
         ));
+    }
+
+    public String forceCloseCampaign(java.util.UUID campaignId) {
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found."));
+
+        if ("FORCE_CLOSED".equals(campaign.getStatus())) {
+            return "Campaign is already forcefully closed.";
+        }
+
+        campaign.setStatus("FORCE_CLOSED");
+ 
+        campaignRepository.save(campaign);
+
+        return "Campaign successfully force-closed. All future payouts have been halted.";
+    }
+
+    public String overrideCampaignStatus(java.util.UUID campaignId, String newStatus) {
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found."));
+
+        String formattedStatus = newStatus.toUpperCase();
+        String oldStatus = campaign.getStatus();
+
+        if ("ACTIVE".equals(formattedStatus) && campaign.getBudgetRemaining().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Cannot activate a campaign that has no budget remaining.");
+        }
+
+        campaign.setStatus(formattedStatus); 
+        
+        campaignRepository.save(campaign);
+
+        return "Campaign successfully updated from " + oldStatus + " to " + formattedStatus + ".";
     }
 }
