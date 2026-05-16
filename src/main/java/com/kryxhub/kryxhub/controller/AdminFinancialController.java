@@ -57,4 +57,20 @@ public class AdminFinancialController {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/force-payout/{submissionId}")
+    public ResponseEntity<?> forceManualPayout(
+            @PathVariable java.util.UUID submissionId, 
+            @RequestParam(defaultValue = "1000") int simulatedAddedViews) {
+        try {
+            String resultMessage = payoutService.triggerManualAdminPayout(submissionId, simulatedAddedViews);
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                    "status", "success",
+                    "message", resultMessage
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }

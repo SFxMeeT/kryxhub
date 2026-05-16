@@ -200,4 +200,34 @@ public class PayoutService {
             throw new RuntimeException("Stripe rejected the retry: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public String triggerManualAdminPayout(java.util.UUID submissionId, int simulatedAddedViews) {
+        
+        SubmissionEntity submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+        if (!"ACTIVE".equals(submission.getCampaign().getStatus())) {
+            throw new RuntimeException("Cannot process payout: Campaign is " + submission.getCampaign().getStatus());
+        }
+
+        CampaignPlatformEntity platformRules = platformRepository
+                .findByCampaignIdAndPlatformName(submission.getCampaign().getId(), submission.getPlatformName())
+                .orElseThrow(() -> new RuntimeException("Platform rules not found"));
+
+        int previousViews = submission.getCurrentViews();
+        int newTotalViews = previousViews + simulatedAddedViews;
+
+        BigDecimal viewsInThousands = BigDecimal.valueOf(simulatedAddedViews)
+                .divide(BigDecimal.valueOf(1000), 4, java.math.RoundingMode.HALF_UP);
+        BigDecimal newlyEarnedAmount = viewsInThousands.multiply(platformRules.getCpmRate());
+
+        if (newlyEarnedAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            return "Simulated views did not generate enough revenue to trigger a payout.";
+        }
+
+        executeCalculatedPayout(submission, newTotalViews, newlyEarnedAmount);
+
+        return "Success! Simulated " + simulatedAddedViews + " views and forced payout of $" + newlyEarnedAmount;
+    }
 }
