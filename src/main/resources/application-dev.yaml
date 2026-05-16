@@ -47,6 +47,9 @@ stripe:
     key: ${STRIPE_TEST_KEY}
   webhook:
     secret: ${STRIPE_WEBHOOK_SECRET}
+  connect:
+    webhook:
+      secret: ${STRIPE_WEBHOOK_CONNECT_SECRET}
 
 youtube:
   api-key: ${YOUTUBE_API_KEY}
