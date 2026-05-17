@@ -21,11 +21,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Instant;
 import java.util.*;
@@ -42,6 +44,8 @@ public class AuthService {
     private final RestTemplate restTemplate;
     private final OtpService otpService;
     private final EmailService emailService;
+    private final StringRedisTemplate redisTemplate;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(AuthenticationManager authenticationManager,
                        JwtTokenService jwtTokenService,
@@ -50,7 +54,9 @@ public class AuthService {
                        UserRepository userRepository,
                        TokenBlacklistService tokenBlacklistService,
                        OtpService otpService,
-                       EmailService emailService) {
+                       EmailService emailService,
+                       StringRedisTemplate redisTemplate,
+                       PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
         this.refreshTokenService = refreshTokenService;
@@ -60,6 +66,8 @@ public class AuthService {
         this.restTemplate = new RestTemplate();
         this.otpService = otpService;
         this.emailService = emailService;
+        this.redisTemplate = redisTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -297,5 +305,49 @@ public class AuthService {
                         .build(),
                 authAccessResponse
         );
+    }
+
+    public void initiateForgotPassword(String email) {
+        
+        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        String otp = otpService.generateAndStoreOtp(email, "PASSWORD_RESET");
+
+        System.out.println("EMAIL SENT TO: " + email + " | OTP: " + otp);
+    }
+
+    public String verifyResetOtp(String email, String otp) {
+
+        boolean isValid = otpService.validateOtp(email, "PASSWORD_RESET", otp);
+        
+        if (!isValid) {
+            throw new RuntimeException("Invalid or expired OTP");
+        }
+
+        String resetToken = java.util.UUID.randomUUID().toString();
+        
+        redisTemplate.opsForValue().set("RESET_TOKEN:" + email, resetToken, java.time.Duration.ofMinutes(5));
+
+        return resetToken;
+    }
+
+    public void resetPassword(String email, String resetToken, String newPassword) {
+
+        String redisKey = "RESET_TOKEN:" + email;
+        String storedToken = redisTemplate.opsForValue().get(redisKey);
+
+        if (storedToken == null || !storedToken.equals(resetToken)) {
+            throw new RuntimeException("Password reset session expired or invalid. Please try again.");
+        }
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        redisTemplate.delete(redisKey);
+
+        System.out.println("Password successfully changed for " + email);
     }
 }

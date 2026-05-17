@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -58,6 +56,40 @@ public class AuthController {
 
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody PasswordResetDto.ForgotPasswordRequest request) {
+        try {
+            authService.initiateForgotPassword(request.getEmail());
+            return ResponseEntity.ok(java.util.Map.of("message", "If an account exists, an OTP has been sent."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<?> verifyResetOtp(@RequestBody PasswordResetDto.VerifyOtpRequest request) {
+        try {
+            String resetToken = authService.verifyResetOtp(request.getEmail(), request.getOtp());
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                    "message", "OTP Verified",
+                    "resetToken", resetToken
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetDto.ResetPasswordRequest request) {
+        try {
+            authService.resetPassword(request.getEmail(), request.getResetToken(), request.getNewPassword());
+            return ResponseEntity.ok(java.util.Map.of("message", "Password successfully reset. You can now login."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
 
