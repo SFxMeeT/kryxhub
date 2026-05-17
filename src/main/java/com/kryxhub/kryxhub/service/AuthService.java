@@ -313,7 +313,7 @@ public class AuthService {
 
         String otp = otpService.generateAndStoreOtp(email, "PASSWORD_RESET");
 
-        System.out.println("EMAIL SENT TO: " + email + " | OTP: " + otp);
+        emailService.sendPasswordResetOtp(email, otp);
     }
 
     public String verifyResetOtp(String email, String otp) {
