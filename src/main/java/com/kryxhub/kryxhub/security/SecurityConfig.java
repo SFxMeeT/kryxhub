@@ -22,9 +22,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtBlacklistFilter jwtBlacklistFilter;
+    private final AccountEnforcementFilter accountEnforcementFilter;
 
-    public SecurityConfig(JwtBlacklistFilter jwtBlacklistFilter) {
+    public SecurityConfig(JwtBlacklistFilter jwtBlacklistFilter, AccountEnforcementFilter accountEnforcementFilter) {
         this.jwtBlacklistFilter = jwtBlacklistFilter;
+        this.accountEnforcementFilter = accountEnforcementFilter;
     }
 
     @Bean
@@ -33,7 +35,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/webhooks/**").permitAll();
-                    auth.requestMatchers("/api/auth/**", "/public/**", "/utils/password", "/login.html").permitAll();
+                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns/discover/**", "/utils/password", "/login.html").permitAll();
+                    auth.requestMatchers("/api/admin/**").hasAuthority("SCOPE_ROLE_ADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -41,6 +44,7 @@ public class SecurityConfig {
                     oauth2.jwt(withDefaults());
                 })
                 .addFilterAfter(jwtBlacklistFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(accountEnforcementFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 

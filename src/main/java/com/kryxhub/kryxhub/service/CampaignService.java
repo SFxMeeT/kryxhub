@@ -6,8 +6,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
+import com.kryxhub.kryxhub.dto.CampaignDiscoveryDto;
+import com.kryxhub.kryxhub.dto.AdminCampaignDto;
 
 import com.kryxhub.kryxhub.entity.CampaignEntity;
 import com.kryxhub.kryxhub.entity.CampaignFaqEntity;
@@ -31,14 +37,12 @@ public class CampaignService {
         this.userRepository = userRepository;
     }
 
-    @Transactional // IMPORTANT: If any part fails, the whole save rolls back!
+    @Transactional
     public CampaignEntity createDraftCampaign(CreateCampaignRequest request, String funderEmail) {
         
-        // 1. Get the Brand/Funder
         UserEntity funder = userRepository.findByEmail(funderEmail)
                 .orElseThrow(() -> new RuntimeException("Funder not found"));
 
-        // 2. Build the main Campaign Entity
         CampaignEntity campaign = new CampaignEntity();
         campaign.setFunder(funder);
         campaign.setTitle(request.getTitle());
@@ -55,7 +59,6 @@ public class CampaignService {
         campaign.setCreatedAt(OffsetDateTime.now());
         campaign.setExpiresAt(OffsetDateTime.now().plusDays(30)); 
 
-        // 3. Map Platforms
         if (request.getPlatforms() != null) {
             for (CreateCampaignRequest.PlatformDto pDto : request.getPlatforms()) {
                 CampaignPlatformEntity platform = new CampaignPlatformEntity();
@@ -69,7 +72,6 @@ public class CampaignService {
             }
         }
 
-        // 4. Map Rules (Requirements)
         if (request.getRules() != null) {
             AtomicInteger ruleOrder = new AtomicInteger(0);
             for (String ruleText : request.getRules()) {
@@ -82,7 +84,6 @@ public class CampaignService {
             }
         }
 
-        // 5. Map Content Links (COMPLETED)
         if (request.getLinks() != null) {
             for (CreateCampaignRequest.LinkDto linkDto : request.getLinks()) {
                 CampaignLinkEntity link = new CampaignLinkEntity();
@@ -94,7 +95,6 @@ public class CampaignService {
             }
         }
 
-        // 6. Map FAQs (COMPLETED)
         if (request.getFaqs() != null) {
             AtomicInteger faqOrder = new AtomicInteger(0);
             for (CreateCampaignRequest.FaqDto faqDto : request.getFaqs()) {
@@ -108,7 +108,6 @@ public class CampaignService {
             }
         }
 
-        // 7. Map Questions (COMPLETED)
         if (request.getQuestions() != null) {
             AtomicInteger qOrder = new AtomicInteger(0);
             for (CreateCampaignRequest.QuestionDto qDto : request.getQuestions()) {
@@ -123,7 +122,72 @@ public class CampaignService {
             }
         }
 
-        // 8. Save the Campaign (Cascades to all children)
         return campaignRepository.save(campaign);
+    }
+
+    public Page<CampaignDiscoveryDto> getDiscoveryFeed(int page, int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<CampaignEntity> activeCampaigns = campaignRepository
+                .findByStatusAndBudgetRemainingGreaterThan("ACTIVE", BigDecimal.ZERO, pageable);
+
+        return activeCampaigns.map(campaign -> new CampaignDiscoveryDto(
+                campaign.getId(),
+                campaign.getTitle(),
+                campaign.getDescription(),
+                campaign.getFunder().getUsername(),
+                campaign.getBudgetRemaining()
+        ));
+    }
+
+    public Page<AdminCampaignDto> getAllCampaignsForAdmin(int page, int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<CampaignEntity> allCampaigns = campaignRepository.findAll(pageable);
+
+        return allCampaigns.map(campaign -> new AdminCampaignDto(
+                campaign.getId(),
+                campaign.getTitle(),
+                campaign.getFunder().getUsername(),
+                campaign.getFunder().getEmail(),
+                campaign.getStatus(),
+                campaign.getTotalBudget(),
+                campaign.getBudgetRemaining()
+        ));
+    }
+
+    public String forceCloseCampaign(java.util.UUID campaignId) {
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found."));
+
+        if ("FORCE_CLOSED".equals(campaign.getStatus())) {
+            return "Campaign is already forcefully closed.";
+        }
+
+        campaign.setStatus("FORCE_CLOSED");
+ 
+        campaignRepository.save(campaign);
+
+        return "Campaign successfully force-closed. All future payouts have been halted.";
+    }
+
+    public String overrideCampaignStatus(java.util.UUID campaignId, String newStatus) {
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found."));
+
+        String formattedStatus = newStatus.toUpperCase();
+        String oldStatus = campaign.getStatus();
+
+        if ("ACTIVE".equals(formattedStatus) && campaign.getBudgetRemaining().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Cannot activate a campaign that has no budget remaining.");
+        }
+
+        campaign.setStatus(formattedStatus); 
+        
+        campaignRepository.save(campaign);
+
+        return "Campaign successfully updated from " + oldStatus + " to " + formattedStatus + ".";
     }
 }

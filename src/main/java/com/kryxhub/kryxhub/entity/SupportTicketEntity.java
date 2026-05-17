@@ -46,6 +46,9 @@ public class SupportTicketEntity {
     @Column(name = "opened_on", nullable = false, updatable = false)
     private OffsetDateTime openedOn;
 
+    @Column(name = "resolution_note", columnDefinition = "TEXT")
+    private String resolutionNote;
+
     public SupportTicketEntity() {
     }
 
@@ -118,7 +121,15 @@ public class SupportTicketEntity {
         return closedOn;
     }
 
+    public void setClosedOn(OffsetDateTime closedOn) {
+        this.closedOn = closedOn;
+    }
+
     public OffsetDateTime getOpenedOn() {
         return openedOn;
     }
+
+    public String getResolutionNote() { return resolutionNote; }
+    public void setResolutionNote(String resolutionNote) { this.resolutionNote = resolutionNote; }
+
 }
