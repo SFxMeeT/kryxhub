@@ -70,4 +70,26 @@ public class SubmissionController {
             ));
         }
     }
+
+    @PostMapping(value = "/{submissionId}/answers/{answerId}/image", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadAnswerImage(
+            @PathVariable UUID submissionId,
+            @PathVariable UUID answerId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            Authentication authentication) {
+        try {
+            String imageUrl = submissionService.uploadAnswerImage(submissionId, answerId, authentication.getName(), file);
+            
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Answer image uploaded successfully!",
+                    "url", imageUrl
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            ));
+        }
+    }
 }
