@@ -1,0 +1,440 @@
+Folder PATH listing
+Volume serial number is 820F-F720
+F:.
+|   .gitignore
+|   .gitignore~
+|   Dockerfile
+|   kind-config.yaml
+|   mvnw
+|   mvnw.cmd
+|   pom.xml
+|   project_tree.txt
+|   README.md
+|   
++---.mvn
+|   \---wrapper
+|           maven-wrapper.properties
+|           
++---.vscode
+|       settings.json
+|       
++---k8s
+|       deployment.yaml
+|       ingress.yaml
+|       service.yaml
+|       
++---src
+|   +---main
+|   |   +---java
+|   |   |   \---com
+|   |   |       \---kryxhub
+|   |   |           \---kryxhub
+|   |   |               |   KryxhubApplication.java
+|   |   |               |   
+|   |   |               +---config
+|   |   |               |       PlatformSettingsSeeder.java
+|   |   |               |       S3Config.java
+|   |   |               |       
+|   |   |               +---controller
+|   |   |               |       AdminCampaignController.java
+|   |   |               |       AdminFinancialController.java
+|   |   |               |       AdminSettingsController.java
+|   |   |               |       AdminTicketController.java
+|   |   |               |       AdminUserController.java
+|   |   |               |       AnalyticsController.java
+|   |   |               |       AuthController.java
+|   |   |               |       CampaignController.java
+|   |   |               |       CampaignDiscoveryController.java
+|   |   |               |       ConfigController.java
+|   |   |               |       CreatorPayoutController.java
+|   |   |               |       FunderAnalyticsController.java
+|   |   |               |       FunderDashboardController.java
+|   |   |               |       HealthCheck.java
+|   |   |               |       LinkedAccountController.java
+|   |   |               |       NotificationController.java
+|   |   |               |       PaymentController.java
+|   |   |               |       StripeWebhookController.java
+|   |   |               |       SubmissionController.java
+|   |   |               |       SupportTicketController.java
+|   |   |               |       UserController.java
+|   |   |               |       UtilsController.java
+|   |   |               |       
+|   |   |               +---dto
+|   |   |               |       AdminCampaignDto.java
+|   |   |               |       AdminPayoutDto.java
+|   |   |               |       AdminRevenueDto.java
+|   |   |               |       AdminUserDto.java
+|   |   |               |       AuthAccessResponse.java
+|   |   |               |       AuthCookieAccess.java
+|   |   |               |       AuthRequest.java
+|   |   |               |       AuthResponse.java
+|   |   |               |       CampaignDetailsDto.java
+|   |   |               |       CampaignDiscoveryDto.java
+|   |   |               |       ConnectedAppResponse.java
+|   |   |               |       CreateCampaignRequest.java
+|   |   |               |       CreatorAnalyticsDto.java
+|   |   |               |       CreatorSubmissionResponseDto.java
+|   |   |               |       EmailChangeRequest.java
+|   |   |               |       FunderAnalyticsDto.java
+|   |   |               |       FunderCampaignCardDto.java
+|   |   |               |       FunderMetricsDto.java
+|   |   |               |       InitiateLinkRequest.java
+|   |   |               |       InitiateLinkResponse.java
+|   |   |               |       LinkedAccountsResponseDto.java
+|   |   |               |       NotificationDto.java
+|   |   |               |       OverviewFeedDto.java
+|   |   |               |       PasswordResetDto.java
+|   |   |               |       RefreshTokenRequest.java
+|   |   |               |       RegisterRequest.java
+|   |   |               |       ReviewSubmissionRequest.java
+|   |   |               |       SocialLoginRequest.java
+|   |   |               |       StripeLinkResponse.java
+|   |   |               |       SubmissionModalDetailsDto.java
+|   |   |               |       SubmitVideoRequest.java
+|   |   |               |       SupportTicketDto.java
+|   |   |               |       TopFunderDto.java
+|   |   |               |       UpdateProfileRequest.java
+|   |   |               |       UserActivityDto.java
+|   |   |               |       UserProfileResponse.java
+|   |   |               |       Verify2faEnableRequest.java
+|   |   |               |       Verify2faLoginRequest.java
+|   |   |               |       VerifyEmailChangeRequest.java
+|   |   |               |       VideoStatsDto.java
+|   |   |               |       
+|   |   |               +---entity
+|   |   |               |       CampaignEntity.java
+|   |   |               |       CampaignFaqEntity.java
+|   |   |               |       CampaignLinkEntity.java
+|   |   |               |       CampaignPlatformEntity.java
+|   |   |               |       CampaignQuestionEntity.java
+|   |   |               |       CampaignRuleEntity.java
+|   |   |               |       CommentEntity.java
+|   |   |               |       LikeEntity.java
+|   |   |               |       LinkedSocialAccountEntity.java
+|   |   |               |       NotificationEntity.java
+|   |   |               |       PayoutEntity.java
+|   |   |               |       PlatformSettingsEntity.java
+|   |   |               |       RefreshTokenEntity.java
+|   |   |               |       SubmissionAnswerEntity.java
+|   |   |               |       SubmissionEntity.java
+|   |   |               |       SupportTicketEntity.java
+|   |   |               |       UserEntity.java
+|   |   |               |       
+|   |   |               +---enums
+|   |   |               |       AccountStatus.java
+|   |   |               |       CampaignCategory.java
+|   |   |               |       CampaignStatus.java
+|   |   |               |       CampaignType.java
+|   |   |               |       LinkLabel.java
+|   |   |               |       PayoutStatus.java
+|   |   |               |       Platforms.java
+|   |   |               |       PrimaryPersona.java
+|   |   |               |       QuestionType.java
+|   |   |               |       Role.java
+|   |   |               |       SocialAccountStatus.java
+|   |   |               |       SubmissionStatus.java
+|   |   |               |       TicketStatus.java
+|   |   |               |       TokenType.java
+|   |   |               |       
+|   |   |               +---exception
+|   |   |               |       Requires2faException.java
+|   |   |               |       
+|   |   |               +---repository
+|   |   |               |       CampaignFaqRepository.java
+|   |   |               |       CampaignLinkRepository.java
+|   |   |               |       CampaignPlatformRepository.java
+|   |   |               |       CampaignQuestionRepository.java
+|   |   |               |       CampaignRepository.java
+|   |   |               |       CampaignRuleRepository.java
+|   |   |               |       LinkedSocialAccountRepository.java
+|   |   |               |       NotificationRepository.java
+|   |   |               |       PayoutRepository.java
+|   |   |               |       PlatformSettingsRepository.java
+|   |   |               |       RefreshTokenRepository.java
+|   |   |               |       SubmissionAnswerRepository.java
+|   |   |               |       SubmissionRepository.java
+|   |   |               |       SupportTicketRepository.java
+|   |   |               |       UserRepository.java
+|   |   |               |       
+|   |   |               +---scheduler
+|   |   |               |       PayoutScheduler.java
+|   |   |               |       
+|   |   |               +---security
+|   |   |               |       AccountEnforcementFilter.java
+|   |   |               |       AuthUser.java
+|   |   |               |       AuthUserDetailsService.java
+|   |   |               |       JwtBlacklistFilter.java
+|   |   |               |       JwtConfig.java
+|   |   |               |       RsaKeyProperties.java
+|   |   |               |       SecurityConfig.java
+|   |   |               |       
+|   |   |               \---service
+|   |   |                       AnalyticsService.java
+|   |   |                       AuthService.java
+|   |   |                       CampaignService.java
+|   |   |                       ConnectedAppService.java
+|   |   |                       EmailService.java
+|   |   |                       ExternalApiRouter.java
+|   |   |                       FunderAnalyticsService.java
+|   |   |                       FunderDashboardService.java
+|   |   |                       JwtTokenService.java
+|   |   |                       LinkedAccountService.java
+|   |   |                       NotificationService.java
+|   |   |                       OtpService.java
+|   |   |                       PayoutService.java
+|   |   |                       PlatformApiService.java
+|   |   |                       PlatformVerificationService.java
+|   |   |                       reatorSubmissionResponseDto.java
+|   |   |                       RedditApiService.java
+|   |   |                       RefreshTokenService.java
+|   |   |                       S3StorageService.java
+|   |   |                       StripeConnectService.java
+|   |   |                       StripePaymentService.java
+|   |   |                       SubmissionService.java
+|   |   |                       SupportTicketService.java
+|   |   |                       TokenBlacklistService.java
+|   |   |                       TwitchApiService.java
+|   |   |                       UserService.java
+|   |   |                       VimeoApiService.java
+|   |   |                       YouTubeApiService.java
+|   |   |                       
+|   |   \---resources
+|   |       |   application-dev.yaml
+|   |       |   application.yaml
+|   |       |   
+|   |       +---certs
+|   |       |       public.pem
+|   |       |       
+|   |       \---static
+|   |               login.html
+|   |               onboarding-complete.html
+|   |               payment-cancelled.html
+|   |               payment-success.html
+|   |               
+|   \---test
+|       +---java
+|       |   \---com
+|       |       \---kryxhub
+|       |           \---kryxhub
+|       |                   KryxhubApplicationTests.java
+|       |                   
+|       \---resources
+|               application.yaml
+|               
+\---target
+    +---classes
+    |   |   application-dev.yaml
+    |   |   application.yaml
+    |   |   
+    |   +---certs
+    |   |       public.pem
+    |   |       
+    |   +---com
+    |   |   \---kryxhub
+    |   |       \---kryxhub
+    |   |           |   KryxhubApplication.class
+    |   |           |   
+    |   |           +---config
+    |   |           |       PlatformSettingsSeeder.class
+    |   |           |       S3Config.class
+    |   |           |       
+    |   |           +---controller
+    |   |           |       AdminCampaignController.class
+    |   |           |       AdminFinancialController.class
+    |   |           |       AdminSettingsController.class
+    |   |           |       AdminTicketController.class
+    |   |           |       AdminUserController.class
+    |   |           |       AnalyticsController.class
+    |   |           |       AuthController.class
+    |   |           |       CampaignController.class
+    |   |           |       CampaignDiscoveryController.class
+    |   |           |       ConfigController.class
+    |   |           |       CreatorPayoutController.class
+    |   |           |       FunderAnalyticsController.class
+    |   |           |       FunderDashboardController.class
+    |   |           |       HealthCheck.class
+    |   |           |       LinkedAccountController.class
+    |   |           |       NotificationController.class
+    |   |           |       PaymentController.class
+    |   |           |       StripeWebhookController.class
+    |   |           |       SubmissionController.class
+    |   |           |       SupportTicketController.class
+    |   |           |       UserController.class
+    |   |           |       UtilsController.class
+    |   |           |       
+    |   |           +---dto
+    |   |           |       AdminCampaignDto.class
+    |   |           |       AdminPayoutDto.class
+    |   |           |       AdminRevenueDto.class
+    |   |           |       AdminUserDto.class
+    |   |           |       AuthAccessResponse.class
+    |   |           |       AuthCookieAccess.class
+    |   |           |       AuthRequest.class
+    |   |           |       AuthResponse.class
+    |   |           |       CampaignDetailsDto$HeaderInfo.class
+    |   |           |       CampaignDetailsDto$LinkInfo.class
+    |   |           |       CampaignDetailsDto$PayoutInfo.class
+    |   |           |       CampaignDetailsDto$SidebarInfo.class
+    |   |           |       CampaignDetailsDto$TopVideoInfo.class
+    |   |           |       CampaignDetailsDto.class
+    |   |           |       CampaignDiscoveryDto.class
+    |   |           |       ConnectedAppResponse.class
+    |   |           |       CreateCampaignRequest$FaqDto.class
+    |   |           |       CreateCampaignRequest$LinkDto.class
+    |   |           |       CreateCampaignRequest$PlatformDto.class
+    |   |           |       CreateCampaignRequest$QuestionDto.class
+    |   |           |       CreateCampaignRequest.class
+    |   |           |       CreatorAnalyticsDto$ChartDataPoint.class
+    |   |           |       CreatorAnalyticsDto$Metrics.class
+    |   |           |       CreatorAnalyticsDto.class
+    |   |           |       CreatorSubmissionResponseDto.class
+    |   |           |       EmailChangeRequest.class
+    |   |           |       FunderAnalyticsDto$ChartDataPoint.class
+    |   |           |       FunderAnalyticsDto$Metrics.class
+    |   |           |       FunderAnalyticsDto.class
+    |   |           |       FunderCampaignCardDto.class
+    |   |           |       FunderMetricsDto.class
+    |   |           |       InitiateLinkRequest.class
+    |   |           |       InitiateLinkResponse.class
+    |   |           |       LinkedAccountsResponseDto$AccountDetail.class
+    |   |           |       LinkedAccountsResponseDto.class
+    |   |           |       NotificationDto.class
+    |   |           |       OverviewFeedDto$FeedStats.class
+    |   |           |       OverviewFeedDto.class
+    |   |           |       PasswordResetDto$ForgotPasswordRequest.class
+    |   |           |       PasswordResetDto$ResetPasswordRequest.class
+    |   |           |       PasswordResetDto$VerifyOtpRequest.class
+    |   |           |       PasswordResetDto.class
+    |   |           |       RefreshTokenRequest.class
+    |   |           |       RegisterRequest.class
+    |   |           |       ReviewSubmissionRequest.class
+    |   |           |       SocialLoginRequest.class
+    |   |           |       StripeLinkResponse.class
+    |   |           |       SubmissionModalDetailsDto.class
+    |   |           |       SubmitVideoRequest$AnswerDto.class
+    |   |           |       SubmitVideoRequest.class
+    |   |           |       SupportTicketDto$CreateRequest.class
+    |   |           |       SupportTicketDto$Response.class
+    |   |           |       SupportTicketDto.class
+    |   |           |       TopFunderDto.class
+    |   |           |       UpdateProfileRequest.class
+    |   |           |       UserActivityDto$CampaignActivity.class
+    |   |           |       UserActivityDto$SubmissionActivity.class
+    |   |           |       UserActivityDto.class
+    |   |           |       UserProfileResponse.class
+    |   |           |       Verify2faEnableRequest.class
+    |   |           |       Verify2faLoginRequest.class
+    |   |           |       VerifyEmailChangeRequest.class
+    |   |           |       VideoStatsDto.class
+    |   |           |       
+    |   |           +---entity
+    |   |           |       CampaignEntity.class
+    |   |           |       CampaignFaqEntity.class
+    |   |           |       CampaignLinkEntity.class
+    |   |           |       CampaignPlatformEntity.class
+    |   |           |       CampaignQuestionEntity.class
+    |   |           |       CampaignRuleEntity.class
+    |   |           |       CommentEntity.class
+    |   |           |       LikeEntity.class
+    |   |           |       LinkedSocialAccountEntity.class
+    |   |           |       NotificationEntity.class
+    |   |           |       PayoutEntity.class
+    |   |           |       PlatformSettingsEntity.class
+    |   |           |       RefreshTokenEntity.class
+    |   |           |       SubmissionAnswerEntity.class
+    |   |           |       SubmissionEntity.class
+    |   |           |       SupportTicketEntity.class
+    |   |           |       UserEntity.class
+    |   |           |       
+    |   |           +---enums
+    |   |           |       AccountStatus.class
+    |   |           |       CampaignCategory.class
+    |   |           |       CampaignStatus.class
+    |   |           |       CampaignType.class
+    |   |           |       LinkLabel.class
+    |   |           |       PayoutStatus.class
+    |   |           |       Platforms.class
+    |   |           |       PrimaryPersona.class
+    |   |           |       QuestionType.class
+    |   |           |       Role.class
+    |   |           |       SocialAccountStatus.class
+    |   |           |       SubmissionStatus.class
+    |   |           |       TicketStatus.class
+    |   |           |       TokenType.class
+    |   |           |       
+    |   |           +---exception
+    |   |           |       Requires2faException.class
+    |   |           |       
+    |   |           +---repository
+    |   |           |       CampaignFaqRepository.class
+    |   |           |       CampaignLinkRepository.class
+    |   |           |       CampaignPlatformRepository.class
+    |   |           |       CampaignQuestionRepository.class
+    |   |           |       CampaignRepository.class
+    |   |           |       CampaignRuleRepository.class
+    |   |           |       LinkedSocialAccountRepository.class
+    |   |           |       NotificationRepository.class
+    |   |           |       PayoutRepository.class
+    |   |           |       PlatformSettingsRepository.class
+    |   |           |       RefreshTokenRepository.class
+    |   |           |       SubmissionAnswerRepository.class
+    |   |           |       SubmissionRepository.class
+    |   |           |       SupportTicketRepository.class
+    |   |           |       UserRepository.class
+    |   |           |       
+    |   |           +---scheduler
+    |   |           |       PayoutScheduler.class
+    |   |           |       
+    |   |           +---security
+    |   |           |       AccountEnforcementFilter.class
+    |   |           |       AuthUser.class
+    |   |           |       AuthUserDetailsService.class
+    |   |           |       JwtBlacklistFilter.class
+    |   |           |       JwtConfig.class
+    |   |           |       RsaKeyProperties.class
+    |   |           |       SecurityConfig.class
+    |   |           |       
+    |   |           \---service
+    |   |                   AnalyticsService.class
+    |   |                   AuthService.class
+    |   |                   CampaignService.class
+    |   |                   ConnectedAppService.class
+    |   |                   EmailService.class
+    |   |                   ExternalApiRouter.class
+    |   |                   FunderAnalyticsService.class
+    |   |                   FunderDashboardService.class
+    |   |                   JwtTokenService.class
+    |   |                   LinkedAccountService.class
+    |   |                   NotificationService.class
+    |   |                   OtpService.class
+    |   |                   PayoutService.class
+    |   |                   PlatformApiService.class
+    |   |                   PlatformVerificationService.class
+    |   |                   reatorSubmissionResponseDto.class
+    |   |                   RedditApiService.class
+    |   |                   RefreshTokenService.class
+    |   |                   S3StorageService.class
+    |   |                   StripeConnectService.class
+    |   |                   StripePaymentService.class
+    |   |                   SubmissionService.class
+    |   |                   SupportTicketService.class
+    |   |                   TokenBlacklistService.class
+    |   |                   TwitchApiService.class
+    |   |                   UserService.class
+    |   |                   VimeoApiService.class
+    |   |                   YouTubeApiService.class
+    |   |                   
+    |   \---static
+    |           login.html
+    |           onboarding-complete.html
+    |           payment-cancelled.html
+    |           payment-success.html
+    |           
+    \---test-classes
+        |   application.yaml
+        |   
+        \---com
+            \---kryxhub
+                \---kryxhub
+                        KryxhubApplicationTests.class
+                        
