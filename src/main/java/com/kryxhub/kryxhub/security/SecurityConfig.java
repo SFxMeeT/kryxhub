@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/webhooks/**").permitAll();
-                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns/discover/**", "/utils/password", "/login.html").permitAll();
+                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns/discover/**", "/api/campaigns/feed", "/utils/password", "/login.html").permitAll();
                     auth.requestMatchers("/api/admin/**").hasAuthority("SCOPE_ROLE_ADMIN");
                     auth.anyRequest().authenticated();
                 })

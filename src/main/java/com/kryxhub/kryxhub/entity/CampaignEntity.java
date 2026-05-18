@@ -67,6 +67,15 @@ public class CampaignEntity {
     @Column(name = "funded_at")
     private OffsetDateTime fundedAt;
 
+    @Column(name = "view_count", nullable = false)
+    private Integer viewCount = 0;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeEntity> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments = new ArrayList<>();
+
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CampaignPlatformEntity> platforms = new ArrayList<>();
 
@@ -208,6 +217,11 @@ public class CampaignEntity {
     public void setFundedAt(OffsetDateTime fundedAt) {
         this.fundedAt = fundedAt;
     }
+
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+    public List<LikeEntity> getLikes() { return likes; }
+    public List<CommentEntity> getComments() { return comments; }
 
     public List<CampaignPlatformEntity> getPlatforms() {
         return platforms;

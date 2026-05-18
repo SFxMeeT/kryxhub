@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
+import com.kryxhub.kryxhub.dto.OverviewFeedDto;
 import com.kryxhub.kryxhub.dto.CampaignDiscoveryDto;
 import com.kryxhub.kryxhub.dto.AdminCampaignDto;
 
@@ -215,5 +216,52 @@ public class CampaignService {
         campaignRepository.save(campaign);
 
         return imageUrl;
+    }
+
+    private String calculateTimeAgo(OffsetDateTime createdAt) {
+        long minutes = java.time.temporal.ChronoUnit.MINUTES.between(createdAt, OffsetDateTime.now());
+        if (minutes < 60) return minutes + " minutes ago";
+        long hours = minutes / 60;
+        if (hours < 24) return hours + " hours ago";
+        return (hours / 24) + " days ago";
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OverviewFeedDto> getOverviewFeed(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<CampaignEntity> campaigns = campaignRepository.findByStatusAndBudgetRemainingGreaterThan(
+                "ACTIVE", BigDecimal.ZERO, pageable);
+
+        return campaigns.map(c -> {
+            java.util.List<String> platformNames = c.getPlatforms().stream()
+                    .map(p -> p.getPlatformName().name())
+                    .toList();
+
+            String cpmDisplay = c.getPlatforms().isEmpty() ? "N/A" : 
+                    "$" + c.getPlatforms().get(0).getCpmRate() + " per 1,000 Views";
+
+            String budgetDisplay = "$" + String.format("%,.0f", c.getTotalBudget());
+
+            OverviewFeedDto.FeedStats stats = new OverviewFeedDto.FeedStats(
+                    c.getLikes().size(),
+                    c.getComments().size(),
+                    c.getViewCount() != null ? c.getViewCount() : 0
+            );
+
+            return new OverviewFeedDto(
+                    c.getId(),
+                    c.getFunder().getProfilePicUrl(),
+                    "@" + c.getFunder().getUsername(),
+                    c.getType().name(),
+                    calculateTimeAgo(c.getCreatedAt()),
+                    c.getTitle(),
+                    cpmDisplay,
+                    budgetDisplay,
+                    platformNames,
+                    c.getThumbnailUrl(),
+                    stats
+            );
+        });
     }
 }

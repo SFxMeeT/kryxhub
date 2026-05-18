@@ -69,7 +69,7 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setDisplayName(request.getDisplayName());
         user.setUsername(request.getEmail().split("@")[0] + UUID.randomUUID().toString().substring(0, 5));
-        user.setRole(Role.CREATOR);
+        user.setRole(Role.USER);
         user.setAccountStatus(AccountStatus.ACTIVE);
 
         user = userRepository.save(user);
@@ -260,9 +260,10 @@ public class UserService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserActivityDto activityTracker = new UserActivityDto(user.getUsername(), user.getRole());
+        UserActivityDto activityTracker = new UserActivityDto(user.getUsername(), user.getPrimaryPersona().name());
 
-        if (user.getRole() == Role.FUNDER) {
+        if (user.getPrimaryPersona() == com.kryxhub.kryxhub.enums.PrimaryPersona.FUNDER) {
+            
             List<CampaignEntity> userCampaigns = campaignRepository.findByFunder(user);
             
             List<UserActivityDto.CampaignActivity> campaignDtos = userCampaigns.stream()
@@ -271,9 +272,9 @@ public class UserService {
                     )).collect(Collectors.toList());
                     
             activityTracker.setCampaigns(campaignDtos);
-        } 
-
-        else if (user.getRole() == Role.CREATOR) {
+            
+        } else if (user.getPrimaryPersona() == com.kryxhub.kryxhub.enums.PrimaryPersona.CREATOR) {
+            
             List<SubmissionEntity> userSubmissions = submissionRepository.findByCreator(user);
             
             List<UserActivityDto.SubmissionActivity> submissionDtos = userSubmissions.stream()
