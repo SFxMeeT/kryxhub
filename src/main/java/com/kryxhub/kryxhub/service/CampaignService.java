@@ -1,7 +1,12 @@
 package com.kryxhub.kryxhub.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
@@ -15,15 +20,19 @@ import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
 import com.kryxhub.kryxhub.dto.OverviewFeedDto;
 import com.kryxhub.kryxhub.dto.CampaignDiscoveryDto;
 import com.kryxhub.kryxhub.dto.AdminCampaignDto;
-
+import com.kryxhub.kryxhub.dto.CampaignDetailsDto;
+import com.kryxhub.kryxhub.enums.CampaignCategory;
+import com.kryxhub.kryxhub.enums.CampaignType;
+import com.kryxhub.kryxhub.enums.Platforms;
 import com.kryxhub.kryxhub.enums.PrimaryPersona;
-
+import com.kryxhub.kryxhub.enums.SubmissionStatus;
 import com.kryxhub.kryxhub.entity.CampaignEntity;
 import com.kryxhub.kryxhub.entity.CampaignFaqEntity;
 import com.kryxhub.kryxhub.entity.CampaignLinkEntity;
 import com.kryxhub.kryxhub.entity.CampaignPlatformEntity;
 import com.kryxhub.kryxhub.entity.CampaignQuestionEntity;
 import com.kryxhub.kryxhub.entity.CampaignRuleEntity;
+import com.kryxhub.kryxhub.entity.SubmissionEntity;
 import com.kryxhub.kryxhub.entity.UserEntity;
 
 import com.kryxhub.kryxhub.repository.CampaignRepository;
@@ -135,20 +144,64 @@ public class CampaignService {
         return campaignRepository.save(campaign);
     }
 
-    public Page<CampaignDiscoveryDto> getDiscoveryFeed(int page, int size) {
+    private String formatNumberToK(long number) {
+        if (number < 1000) return String.valueOf(number);
+        return String.format("%.1fk", number / 1000.0).replace(".0k", "k");
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CampaignDiscoveryDto> getDiscoveryFeed(
+            String keyword, CampaignCategory category, 
+            CampaignType type, Platforms platform, 
+            int page, int size) {
         
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<CampaignEntity> activeCampaigns = campaignRepository
-                .findByStatusAndBudgetRemainingGreaterThan("ACTIVE", BigDecimal.ZERO, pageable);
+        Page<CampaignEntity> activeCampaigns = campaignRepository.discoverCampaignsWithFilters(
+                keyword, category, type, platform, pageable);
 
-        return activeCampaigns.map(campaign -> new CampaignDiscoveryDto(
-                campaign.getId(),
-                campaign.getTitle(),
-                campaign.getDescription(),
-                campaign.getFunder().getUsername(),
-                campaign.getBudgetRemaining()
-        ));
+        return activeCampaigns.map(c -> {
+
+            java.math.BigDecimal paidOut = c.getTotalBudget().subtract(c.getBudgetRemaining());
+            String paidOutDisplay = "$" + paidOut;
+            String totalBudgetDisplay = "$" + String.format("%,.0f", c.getTotalBudget());
+
+            String cpmDisplay = c.getPlatforms().isEmpty() ? "N/A" : 
+                    "$" + c.getPlatforms().get(0).getCpmRate() + "/ 1k views";
+
+            long totalSubs = c.getSubmissions().size();
+            long approvedSubs = c.getSubmissions().stream()
+                    .filter(s -> s.getStatus() == SubmissionStatus.APPROVED)
+                    .count();
+            String approvalPercentage = totalSubs == 0 ? "0%" : ((approvedSubs * 100) / totalSubs) + "%";
+
+            long totalViews = c.getSubmissions().stream()
+                    .mapToInt(SubmissionEntity::getCurrentViews).sum();
+            
+            long uniqueCreators = c.getSubmissions().stream()
+                    .map(s -> s.getCreator().getId())
+                    .distinct().count();
+
+            java.util.List<String> platformNames = c.getPlatforms().stream()
+                    .map(p -> p.getPlatformName().name())
+                    .toList();
+
+            return new CampaignDiscoveryDto(
+                    c.getId(),
+                    c.getFunder().getProfilePicUrl(),
+                    c.getType().name(),
+                    c.getCategory().name(),
+                    calculateTimeAgo(c.getCreatedAt()),
+                    c.getTitle(),
+                    platformNames,
+                    paidOutDisplay,
+                    totalBudgetDisplay,
+                    cpmDisplay,
+                    approvalPercentage,
+                    formatNumberToK(totalViews),
+                    uniqueCreators
+            );
+        });
     }
 
     public Page<AdminCampaignDto> getAllCampaignsForAdmin(int page, int size) {
@@ -263,5 +316,109 @@ public class CampaignService {
                     stats
             );
         });
+    }
+
+    private String formatDate(java.time.OffsetDateTime date) {
+        if (date == null) return "N/A";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
+        return date.format(formatter);
+    }
+
+    @Transactional(readOnly = true)
+    public CampaignDetailsDto getCampaignDetails(java.util.UUID campaignId) {
+        
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found"));
+
+        long totalReviewMinutes = 0;
+        int reviewedCount = 0;
+        int pendingCount = 0;
+        int approvedCount = 0;
+
+        for (SubmissionEntity sub : campaign.getSubmissions()) {
+            if (sub.getStatus() == SubmissionStatus.PENDING) pendingCount++;
+            if (sub.getStatus() == SubmissionStatus.APPROVED) approvedCount++;
+            
+            if (sub.getReviewedAt() != null) {
+                totalReviewMinutes += ChronoUnit.MINUTES.between(sub.getSubmittedAt(), sub.getReviewedAt());
+                reviewedCount++;
+            }
+        }
+
+        String avgReviewTime = "N/A";
+        if (reviewedCount > 0) {
+            long avgMins = totalReviewMinutes / reviewedCount;
+            if (avgMins > 1440) avgReviewTime = (avgMins / 1440) + "d";
+            else if (avgMins > 60) avgReviewTime = (avgMins / 60) + "h";
+            else avgReviewTime = avgMins + "m";
+        }
+
+        int totalSubs = campaign.getSubmissions().size();
+        String approvalRate = totalSubs == 0 ? "0%" : ((approvedCount * 100) / totalSubs) + "%";
+
+        List<String> platformNames = campaign.getPlatforms().stream()
+                .map(p -> p.getPlatformName().name())
+                .toList();
+        
+        String cpmSummary = campaign.getPlatforms().isEmpty() ? "N/A" : 
+                "$" + campaign.getPlatforms().get(0).getCpmRate() + " / 1k views";
+
+        CampaignDetailsDto.HeaderInfo header = new CampaignDetailsDto.HeaderInfo(
+                campaign.getTitle(), campaign.getType().name(), campaign.getCategory().name(), 
+                cpmSummary, avgReviewTime, approvalRate, campaign.getThumbnailUrl(), platformNames
+        );
+
+        BigDecimal totalBudget = campaign.getTotalBudget();
+        BigDecimal budgetRemaining = campaign.getBudgetRemaining();
+        BigDecimal paidOut = totalBudget.subtract(budgetRemaining);
+        
+        long paidOutPercent = totalBudget.compareTo(BigDecimal.ZERO) == 0 ? 0 : 
+                paidOut.multiply(new BigDecimal(100)).divide(totalBudget, RoundingMode.HALF_UP).longValue();
+        
+        String paidOutDisplay = "Paid Out: $" + paidOut + " / " + paidOutPercent + "%";
+        
+        String budgetRemainingStr = budgetRemaining.doubleValue() >= 1000 ? 
+                "$" + String.format("%.2fk", budgetRemaining.doubleValue() / 1000.0) : "$" + budgetRemaining;
+
+        CampaignDetailsDto.SidebarInfo sidebar = new CampaignDetailsDto.SidebarInfo(
+                budgetRemainingStr, paidOutDisplay, 
+                pendingCount >= 10,
+                campaign.getCategory().name(), 
+                formatDate(campaign.getUpdatedAt()), 
+                formatDate(campaign.getCreatedAt())
+        );
+
+        List<String> requirements = campaign.getRules().stream()
+                .sorted(Comparator.comparingInt(CampaignRuleEntity::getDisplayOrder))
+                .map(CampaignRuleEntity::getRuleText)
+                .toList();
+
+        List<CampaignDetailsDto.PayoutInfo> payouts = campaign.getPlatforms().stream()
+                .map(p -> new CampaignDetailsDto.PayoutInfo(
+                        p.getPlatformName().name(), 
+                        "$" + p.getCpmRate(), 
+                        "$" + p.getMinPayout(), 
+                        "$" + p.getMaxPayout()
+                )).toList();
+
+        List<CampaignDetailsDto.LinkInfo> contentLinks = campaign.getLinks().stream()
+                .map(l -> new CampaignDetailsDto.LinkInfo(l.getLabel().name(), l.getUrl()))
+                .toList();
+
+        AtomicInteger rankCounter = new AtomicInteger(1);
+        List<CampaignDetailsDto.TopVideoInfo> topVideos = campaign.getSubmissions().stream()
+                .filter(s -> s.getStatus() == SubmissionStatus.APPROVED)
+                .sorted(java.util.Comparator.comparingInt(SubmissionEntity::getCurrentViews).reversed())
+                .limit(3)
+                .map(s -> new CampaignDetailsDto.TopVideoInfo(
+                        rankCounter.getAndIncrement(), 
+                        String.format("%,d", s.getCurrentViews()), 
+                        "$" + s.getTotalEarned(), 
+                        s.getVideoUrl()
+                )).toList();
+
+        return new CampaignDetailsDto(
+                header, sidebar, requirements, payouts, contentLinks, topVideos
+        );
     }
 }

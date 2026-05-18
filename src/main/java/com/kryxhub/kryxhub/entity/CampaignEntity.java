@@ -67,6 +67,9 @@ public class CampaignEntity {
     @Column(name = "funded_at")
     private OffsetDateTime fundedAt;
 
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
+
     @Column(name = "view_count", nullable = false)
     private Integer viewCount = 0;
 
@@ -100,6 +103,11 @@ public class CampaignEntity {
     @PrePersist
     protected void onCreate() {
         this.createdAt = OffsetDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = OffsetDateTime.now();
     }
 
     public UUID getId() {
@@ -216,6 +224,14 @@ public class CampaignEntity {
 
     public void setFundedAt(OffsetDateTime fundedAt) {
         this.fundedAt = fundedAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Integer getViewCount() { return viewCount; }

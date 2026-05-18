@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -107,5 +108,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
+    }
+
+    @GetMapping("/ui/top-funders")
+    public ResponseEntity<List<TopFunderDto>> getTopFunders() {
+        return ResponseEntity.ok(userService.getTopFundersSidebar());
     }
 }

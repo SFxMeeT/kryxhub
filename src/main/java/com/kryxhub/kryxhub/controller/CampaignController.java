@@ -60,10 +60,18 @@ public class CampaignController {
         }
     }
 
-    @GetMapping("/feed")
+    @GetMapping("/ui/feed")
     public ResponseEntity<Page<OverviewFeedDto>> getCampaignFeed(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(campaignService.getOverviewFeed(page, size));
+    }
+
+    @GetMapping("/ui/{campaignId}/details")
+    public ResponseEntity<com.kryxhub.kryxhub.dto.CampaignDetailsDto> getCampaignUIDetails(
+            @PathVariable java.util.UUID campaignId) {
+        
+        com.kryxhub.kryxhub.dto.CampaignDetailsDto details = campaignService.getCampaignDetails(campaignId);
+        return ResponseEntity.ok(details);
     }
 }

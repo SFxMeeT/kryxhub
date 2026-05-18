@@ -300,4 +300,11 @@ public class UserService {
 
         return imageUrl;
     }
+
+    @Transactional(readOnly = true)
+    public List<TopFunderDto> getTopFundersSidebar() {
+
+        Pageable limit = PageRequest.of(0, 5);
+        return userRepository.findTopFunders(limit);
+    }
 }
