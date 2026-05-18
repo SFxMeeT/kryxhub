@@ -37,7 +37,11 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Role role = Role.CREATOR;
+    private Role role = Role.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "primary_persona", nullable = false, length = 20)
+    private com.kryxhub.kryxhub.enums.PrimaryPersona primaryPersona = com.kryxhub.kryxhub.enums.PrimaryPersona.GENERAL;
 
     @Column(name = "display_name", nullable = false, length = 100)
     private String displayName;
@@ -171,6 +175,14 @@ public class UserEntity {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public com.kryxhub.kryxhub.enums.PrimaryPersona getPrimaryPersona() {
+        return primaryPersona;
+    }
+
+    public void setPrimaryPersona(com.kryxhub.kryxhub.enums.PrimaryPersona primaryPersona) {
+        this.primaryPersona = primaryPersona;
     }
 
     public String getDisplayName() {

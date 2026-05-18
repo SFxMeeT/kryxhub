@@ -15,6 +15,8 @@ import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
 import com.kryxhub.kryxhub.dto.CampaignDiscoveryDto;
 import com.kryxhub.kryxhub.dto.AdminCampaignDto;
 
+import com.kryxhub.kryxhub.enums.PrimaryPersona;
+
 import com.kryxhub.kryxhub.entity.CampaignEntity;
 import com.kryxhub.kryxhub.entity.CampaignFaqEntity;
 import com.kryxhub.kryxhub.entity.CampaignLinkEntity;
@@ -44,6 +46,11 @@ public class CampaignService {
         
         UserEntity funder = userRepository.findByEmail(funderEmail)
                 .orElseThrow(() -> new RuntimeException("Funder not found"));
+        
+        if (funder.getPrimaryPersona() != PrimaryPersona.FUNDER) {
+            funder.setPrimaryPersona(PrimaryPersona.FUNDER);
+            userRepository.save(funder);
+        }
 
         CampaignEntity campaign = new CampaignEntity();
         campaign.setFunder(funder);

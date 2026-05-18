@@ -4,6 +4,7 @@ import com.kryxhub.kryxhub.dto.SubmitVideoRequest;
 import com.kryxhub.kryxhub.dto.VideoStatsDto;
 import com.kryxhub.kryxhub.entity.*;
 import com.kryxhub.kryxhub.enums.SubmissionStatus;
+import com.kryxhub.kryxhub.enums.PrimaryPersona;
 import com.kryxhub.kryxhub.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,11 @@ public class SubmissionService {
 
         UserEntity creator = userRepository.findByEmail(creatorEmail)
                 .orElseThrow(() -> new RuntimeException("Creator not found"));
+        
+        if (creator.getPrimaryPersona() != PrimaryPersona.CREATOR) {
+            creator.setPrimaryPersona(PrimaryPersona.CREATOR);
+            userRepository.save(creator);
+        }
 
         CampaignEntity campaign = campaignRepository.findById(request.getCampaignId())
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));
