@@ -70,7 +70,7 @@ public class CampaignEntity {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    @Column(name = "view_count", nullable = false, columnDefinition = "integer default 0")
+    @Column(name = "view_count", nullable = false)
     private Integer viewCount = 0;
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
