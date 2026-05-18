@@ -28,7 +28,7 @@ public interface CampaignRepository extends JpaRepository<CampaignEntity, UUID> 
         "LEFT JOIN c.platforms p " +
         "WHERE c.status = 'ACTIVE' AND c.budgetRemaining > 0 " +
         "AND c.showOnDiscover = true " +
-        "AND (:keyword IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+        "AND (:keyword IS NULL OR LOWER(c.title) LIKE LOWER(CONCAT('%', CAST(:keyword AS String), '%'))) " +
         "AND (:category IS NULL OR c.category = :category) " +
         "AND (:type IS NULL OR c.type = :type) " +
         "AND (:platform IS NULL OR p.platformName = :platform)"
@@ -38,6 +38,6 @@ public interface CampaignRepository extends JpaRepository<CampaignEntity, UUID> 
             @Param("category") CampaignCategory category,
             @Param("type") CampaignType type,
             @Param("platform") Platforms platform,
-            org.springframework.data.domain.Pageable pageable
+            Pageable pageable
     );
 }
