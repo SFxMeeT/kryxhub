@@ -62,6 +62,15 @@ public class SubmissionEntity {
     @Column(name = "reviewed_at")
     private OffsetDateTime reviewedAt;
 
+    @Column(name = "likes", nullable = false)
+    private Integer currentLikes = 0;
+
+    @Column(name = "commets", nullable = false)
+    private Integer currentComments = 0;
+
+    @Column(name = "shares", nullable = false)
+    private Integer currentShares = 0;
+
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubmissionAnswerEntity> answers = new ArrayList<>();
 
@@ -178,5 +187,29 @@ public class SubmissionEntity {
 
     public List<PayoutEntity> getPayouts() {
         return payouts;
+    }
+
+    public Integer getCurrentLikes() {
+        return currentLikes;
+    }
+
+    public void setCurrentLikes(Integer currentLikes) {
+        this.currentLikes = currentLikes;
+    }
+
+    public Integer getCurrentComments() {
+        return currentComments;
+    }
+
+    public void setCurrentComments(Integer currentComments) {
+        this.currentComments = currentComments;
+    }
+
+    public Integer getCurrentShares() {
+        return currentShares;
+    }
+
+    public void setCurrentShares(Integer currentShares) {
+        this.currentShares = currentShares;
     }
 }

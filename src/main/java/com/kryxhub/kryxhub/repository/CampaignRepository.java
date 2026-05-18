@@ -40,4 +40,15 @@ public interface CampaignRepository extends JpaRepository<CampaignEntity, UUID> 
             @Param("platform") Platforms platform,
             Pageable pageable
     );
+
+    @Query(
+        "SELECT c FROM CampaignEntity c " +
+        "WHERE c.funder.email = :funderEmail " +
+        "AND (:status IS NULL OR c.status = :status)"
+    )
+    Page<CampaignEntity> findFunderCampaigns(
+            @Param("funderEmail") String funderEmail,
+            @Param("status") String status, 
+            Pageable pageable
+    );
 }
