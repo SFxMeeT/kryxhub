@@ -1,33 +1,94 @@
 package com.kryxhub.kryxhub.dto;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public class CampaignDiscoveryDto {
     private UUID id;
+    private String funderProfilePic;
+    private String type;
+    private String category;
+    private String timeAgo;
     private String title;
-    private String description;
-    private String funderName;
-    private BigDecimal budgetRemaining;
+    
+    private List<String> platforms;
+    
+    private String paidOutDisplay;
+    private String totalBudgetDisplay;
+    private String cpmDisplay;
+    
+    private String approvalPercentage;
+    private String totalViewsDisplay;
+    private long creatorsCount;
 
-    public CampaignDiscoveryDto() {}
-
-    public CampaignDiscoveryDto(UUID id, String title, String description, String funderName, BigDecimal budgetRemaining) {
+    public CampaignDiscoveryDto(UUID id, String funderProfilePic, String type, String category, 
+                                String timeAgo, String title, List<String> platforms, 
+                                String paidOutDisplay, String totalBudgetDisplay, String cpmDisplay, 
+                                String approvalPercentage, String totalViewsDisplay, long creatorsCount) {
         this.id = id;
+        this.funderProfilePic = funderProfilePic;
+        this.type = type;
+        this.category = category;
+        this.timeAgo = timeAgo;
         this.title = title;
-        this.description = description;
-        this.funderName = funderName;
-        this.budgetRemaining = budgetRemaining;
+        this.platforms = platforms;
+        this.paidOutDisplay = paidOutDisplay;
+        this.totalBudgetDisplay = totalBudgetDisplay;
+        this.cpmDisplay = cpmDisplay;
+        this.approvalPercentage = approvalPercentage;
+        this.totalViewsDisplay = totalViewsDisplay;
+        this.creatorsCount = creatorsCount;
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public String getFunderName() { return funderName; }
-    public void setFunderName(String funderName) { this.funderName = funderName; }
-    public BigDecimal getBudgetRemaining() { return budgetRemaining; }
-    public void setBudgetRemaining(BigDecimal budgetRemaining) { this.budgetRemaining = budgetRemaining; }
+    public UUID getId() {
+        return id;
+    }
+
+    public String getFunderProfilePic() {
+        return funderProfilePic;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getTimeAgo() {
+        return timeAgo;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public List<String> getPlatforms() {
+        return platforms;
+    }
+
+    public String getPaidOutDisplay() {
+        return paidOutDisplay;
+    }
+
+    public String getTotalBudgetDisplay() {
+        return totalBudgetDisplay;
+    }
+
+    public String getCpmDisplay() {
+        return cpmDisplay;
+    }
+
+    public String getApprovalPercentage() {
+        return approvalPercentage;
+    }
+
+    public String getTotalViewsDisplay() {
+        return totalViewsDisplay;
+    }
+
+    public long getCreatorsCount() {
+        return creatorsCount;
+    }
 }
