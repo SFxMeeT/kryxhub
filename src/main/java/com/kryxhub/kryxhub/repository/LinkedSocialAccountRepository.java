@@ -13,4 +13,6 @@ public interface LinkedSocialAccountRepository extends JpaRepository<LinkedSocia
 
     boolean existsByUserAndPlatformAndIsVerified(UserEntity user, Platforms platform, Boolean isVerified);
 
+    java.util.List<LinkedSocialAccountEntity> findByUserEmail(String email);
+
 }

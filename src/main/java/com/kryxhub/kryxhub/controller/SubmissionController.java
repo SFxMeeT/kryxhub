@@ -2,11 +2,20 @@ package com.kryxhub.kryxhub.controller;
 
 import com.kryxhub.kryxhub.dto.SubmitVideoRequest;
 import com.kryxhub.kryxhub.entity.SubmissionEntity;
+import com.kryxhub.kryxhub.enums.CampaignType;
+import com.kryxhub.kryxhub.enums.SubmissionStatus;
 import com.kryxhub.kryxhub.service.SubmissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import com.kryxhub.kryxhub.dto.CreatorSubmissionResponseDto;
 import com.kryxhub.kryxhub.dto.ReviewSubmissionRequest;
+import com.kryxhub.kryxhub.dto.SubmissionModalDetailsDto;
+
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Map;
 import java.util.UUID;
@@ -91,5 +100,29 @@ public class SubmissionController {
                     "message", e.getMessage()
             ));
         }
+    }
+
+    @GetMapping("/ui/my-submissions")
+    public ResponseEntity<Page<CreatorSubmissionResponseDto>> getMySubmissions(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(required = false) SubmissionStatus status,
+            @RequestParam(required = false) UUID campaignId,
+            @RequestParam(required = false) CampaignType campaignType,
+            @RequestParam(defaultValue = "MOST_RECENT") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        String creatorEmail = jwt.getClaimAsString("email");
+        return ResponseEntity.ok(submissionService.getCreatorSubmissionsFeed(
+                creatorEmail, status, campaignId, campaignType, sortBy, page, size));
+    }
+
+    @GetMapping("/ui/{submissionId}/payout-details")
+    public ResponseEntity<SubmissionModalDetailsDto> getPayoutDetails(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable java.util.UUID submissionId) {
+
+        String creatorEmail = jwt.getClaimAsString("email");
+        return ResponseEntity.ok(submissionService.getSubmissionModalDetails(submissionId, creatorEmail));
     }
 }

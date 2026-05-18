@@ -4,14 +4,25 @@ import com.kryxhub.kryxhub.dto.SubmitVideoRequest;
 import com.kryxhub.kryxhub.dto.VideoStatsDto;
 import com.kryxhub.kryxhub.entity.*;
 import com.kryxhub.kryxhub.enums.SubmissionStatus;
+import com.kryxhub.kryxhub.enums.CampaignType;
 import com.kryxhub.kryxhub.enums.PrimaryPersona;
 import com.kryxhub.kryxhub.repository.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.kryxhub.kryxhub.dto.CreatorSubmissionResponseDto;
 import com.kryxhub.kryxhub.dto.ReviewSubmissionRequest;
+import com.kryxhub.kryxhub.dto.SubmissionModalDetailsDto;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
@@ -160,5 +171,73 @@ public class SubmissionService {
         answerRepository.save(answer);
 
         return imageUrl;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CreatorSubmissionResponseDto> getCreatorSubmissionsFeed(
+            String creatorEmail, SubmissionStatus status, UUID campaignId,
+            CampaignType campaignType, String sortBy, int page, int size) {
+        
+            Sort sortOrder = switch (sortBy != null ? sortBy.toUpperCase() : "MOST_RECENT") {
+            case "MOST_VIEWED" -> Sort.by(Sort.Direction.DESC, "currentViews");
+            case "MOST_EARNED" -> Sort.by(Sort.Direction.DESC, "totalEarned");
+            default -> Sort.by(Sort.Direction.DESC, "id");
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        
+        Page<SubmissionEntity> submissions = submissionRepository
+                .findCreatorSubmissionsWithFilters(creatorEmail, status, campaignId, campaignType, pageable);
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
+
+        return submissions.map(s -> {
+
+            int minViews = s.getCampaign().getPlatforms().stream()
+                    .filter(p -> p.getPlatformName().name().equals(s.getPlatformName()))
+                    .findFirst()
+                    .map(p -> {
+                        if (p.getCpmRate().compareTo(BigDecimal.ZERO) == 0) return 0;
+                        return p.getMinPayout().divide(p.getCpmRate(), RoundingMode.HALF_UP)
+                                .multiply(new BigDecimal(1000)).intValue();
+                    }).orElse(0);
+
+            String formattedDate = s.getReviewedAt() != null ? s.getReviewedAt().format(dateFormatter) : "Recent";
+
+            return new CreatorSubmissionResponseDto(
+                    s.getId(), s.getVideoTitle(), s.getVideoUrl(), s.getCampaign().getTitle(),
+                    "@" + s.getCreator().getUsername(), s.getStatus().name(), s.getCurrentViews(),
+                    minViews, formattedDate, "$" + s.getEstimatedPayout()
+            );
+        });
+    }
+
+    @Transactional(readOnly = true)
+    public SubmissionModalDetailsDto getSubmissionModalDetails(UUID submissionId, String creatorEmail) {
+        SubmissionEntity s = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission record not found"));
+
+        if (!s.getCreator().getEmail().equals(creatorEmail)) {
+            throw new RuntimeException("Unauthorized data access exception");
+        }
+
+        var platformOpt = s.getCampaign().getPlatforms().stream()
+                .filter(p -> p.getPlatformName().name().equals(s.getPlatformName())).findFirst();
+
+        int minViews = platformOpt.map(p -> {
+            if (p.getCpmRate().compareTo(BigDecimal.ZERO) == 0) return 0;
+            return p.getMinPayout().divide(p.getCpmRate(), RoundingMode.HALF_UP)
+                    .multiply(new java.math.BigDecimal(1000)).intValue();
+        }).orElse(0);
+
+        String minThresholdDisplay = platformOpt.map(p -> "$" + p.getMinPayout()).orElse("$0.00");
+
+        String notesDisplay = s.getFunderNotes() != null ? s.getFunderNotes() : "No notes yet";
+
+        return new SubmissionModalDetailsDto(
+                s.getVideoTitle(), s.getCampaign().getTitle(), s.getStatus().name(),
+                s.getCurrentViews(), minViews, "Recent", notesDisplay,
+                "$" + s.getTotalEarned(), "$" + s.getTotalEarned(), "-", "-", minThresholdDisplay
+        );
     }
 }
