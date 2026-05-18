@@ -67,3 +67,10 @@ resend:
 rsa:
   private-key: ${PRIVATE_KEY_PATH:classpath:certs/private.pem}
   public-key: classpath:certs/public.pem
+
+aws:
+  s3:
+    bucket-name: amzn-s3-kryxhub-bucket
+    region: ${S3_REGION}
+  access-key: ${S3_ACCESS_KEY}
+  secret-key: ${S3_SECRET_KEY}

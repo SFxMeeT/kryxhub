@@ -31,10 +31,12 @@ public class CampaignService {
 
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
+    private final S3StorageService s3StorageService;
 
-    public CampaignService(CampaignRepository campaignRepository, UserRepository userRepository) {
+    public CampaignService(CampaignRepository campaignRepository, UserRepository userRepository, S3StorageService s3StorageService) {
         this.campaignRepository = campaignRepository;
         this.userRepository = userRepository;
+        this.s3StorageService = s3StorageService;
     }
 
     @Transactional
@@ -189,5 +191,22 @@ public class CampaignService {
         campaignRepository.save(campaign);
 
         return "Campaign successfully updated from " + oldStatus + " to " + formattedStatus + ".";
+    }
+
+    @Transactional
+    public String updateCampaignThumbnail(java.util.UUID campaignId, String funderEmail, org.springframework.web.multipart.MultipartFile file) {
+        CampaignEntity campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new RuntimeException("Campaign not found"));
+
+        if (!campaign.getFunder().getEmail().equals(funderEmail)) {
+            throw new RuntimeException("Unauthorized: You do not own this campaign.");
+        }
+
+        String imageUrl = s3StorageService.uploadFile(file, "campaigns");
+
+        campaign.setThumbnailUrl(imageUrl);
+        campaignRepository.save(campaign);
+
+        return imageUrl;
     }
 }
