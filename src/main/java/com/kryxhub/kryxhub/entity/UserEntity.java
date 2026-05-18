@@ -41,7 +41,7 @@ public class UserEntity {
     private Role role = Role.USER;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "primary_persona", nullable = false, length = 20, columnDefinition = "varchar(20) default 'GENERAL'")
+    @Column(name = "primary_persona", nullable = false, length = 20)
     private PrimaryPersona primaryPersona = PrimaryPersona.GENERAL;
 
     @Column(name = "display_name", nullable = false, length = 100)
