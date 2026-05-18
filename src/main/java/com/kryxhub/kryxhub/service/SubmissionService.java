@@ -3,7 +3,6 @@ package com.kryxhub.kryxhub.service;
 import com.kryxhub.kryxhub.dto.SubmitVideoRequest;
 import com.kryxhub.kryxhub.dto.VideoStatsDto;
 import com.kryxhub.kryxhub.entity.*;
-import com.kryxhub.kryxhub.enums.Platforms;
 import com.kryxhub.kryxhub.enums.SubmissionStatus;
 import com.kryxhub.kryxhub.repository.*;
 import org.springframework.stereotype.Service;
@@ -24,19 +23,25 @@ public class SubmissionService {
     private final LinkedSocialAccountRepository linkedAccountRepository;
     private final CampaignQuestionRepository questionRepository;
     private final ExternalApiRouter apiRouter;
+    private final S3StorageService s3StorageService;
+    private final SubmissionAnswerRepository answerRepository;
 
     public SubmissionService(SubmissionRepository submissionRepository, 
                              CampaignRepository campaignRepository, 
                              UserRepository userRepository, 
                              LinkedSocialAccountRepository linkedAccountRepository,
                              CampaignQuestionRepository questionRepository,
-                             ExternalApiRouter apiRouter) {
+                             ExternalApiRouter apiRouter,
+                             S3StorageService s3StorageService,
+                             SubmissionAnswerRepository answerRepository) {
         this.submissionRepository = submissionRepository;
         this.campaignRepository = campaignRepository;
         this.userRepository = userRepository;
         this.linkedAccountRepository = linkedAccountRepository;
         this.questionRepository = questionRepository;
         this.apiRouter = apiRouter;
+        this.s3StorageService = s3StorageService;
+        this.answerRepository = answerRepository;
     }
 
     @Transactional
@@ -124,5 +129,30 @@ public class SubmissionService {
         submission.setReviewedAt(OffsetDateTime.now());
 
         return submissionRepository.save(submission);
+    }
+
+    @Transactional
+    public String uploadAnswerImage(java.util.UUID submissionId, java.util.UUID answerId, String creatorEmail, org.springframework.web.multipart.MultipartFile file) {
+        
+        SubmissionEntity submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+        if (!submission.getCreator().getEmail().equals(creatorEmail)) {
+            throw new RuntimeException("Unauthorized: You do not own this submission.");
+        }
+
+        SubmissionAnswerEntity answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+
+        if (!answer.getSubmission().getId().equals(submissionId)) {
+            throw new RuntimeException("Security Error: Answer does not belong to this submission.");
+        }
+
+        String imageUrl = s3StorageService.uploadFile(file, "submission-proofs");
+
+        answer.setAnswerValue(imageUrl);
+        answerRepository.save(answer);
+
+        return imageUrl;
     }
 }
