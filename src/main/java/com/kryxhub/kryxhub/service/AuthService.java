@@ -279,7 +279,7 @@ public class AuthService {
 
             user.setProfilePicUrl(pictureUrl);
             user.setUsername(email.split("@")[0] + UUID.randomUUID().toString().substring(0, 5));
-            user.setRole(Role.CREATOR);
+            user.setRole(Role.USER);
             user.setAccountStatus(AccountStatus.ACTIVE);
             user = userRepository.save(user);
         }

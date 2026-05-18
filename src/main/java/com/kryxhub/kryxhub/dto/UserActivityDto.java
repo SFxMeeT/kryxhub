@@ -1,6 +1,5 @@
 package com.kryxhub.kryxhub.dto;
 
-import com.kryxhub.kryxhub.enums.Role;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,17 +7,19 @@ import java.util.UUID;
 
 public class UserActivityDto {
     private String username;
-    private Role role;
+    private String persona;
     private List<CampaignActivity> campaigns = new ArrayList<>();
     private List<SubmissionActivity> submissions = new ArrayList<>();
 
-    public UserActivityDto(String username, Role role) {
+    public UserActivityDto(String username, String persona) {
         this.username = username;
-        this.role = role;
+        this.persona = persona;
     }
 
     public String getUsername() { return username; }
-    public Role getRole() { return role; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPersona() { return persona; }
+    public void setPersona(String persona) { this.persona = persona; }
     public List<CampaignActivity> getCampaigns() { return campaigns; }
     public void setCampaigns(List<CampaignActivity> campaigns) { this.campaigns = campaigns; }
     public List<SubmissionActivity> getSubmissions() { return submissions; }

@@ -1,11 +1,13 @@
 package com.kryxhub.kryxhub.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import com.kryxhub.kryxhub.dto.CreateCampaignRequest;
+import com.kryxhub.kryxhub.dto.OverviewFeedDto;
 import com.kryxhub.kryxhub.service.CampaignService;
 import com.kryxhub.kryxhub.entity.CampaignEntity;
 
@@ -56,5 +58,12 @@ public class CampaignController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<Page<OverviewFeedDto>> getCampaignFeed(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(campaignService.getOverviewFeed(page, size));
     }
 }
