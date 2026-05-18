@@ -95,4 +95,17 @@ public class UserController {
         userService.confirm2faEnable(principal.getName(), request);
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Two-Factor Authentication successfully enabled!\"}");
     }
+
+    @PostMapping(value = "/me/profile-picture", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadProfilePicture(Principal principal, @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            String imageUrl = userService.updateProfilePicture(principal.getName(), file);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "message", "Profile picture updated successfully!",
+                    "url", imageUrl
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }

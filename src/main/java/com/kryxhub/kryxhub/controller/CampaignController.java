@@ -41,4 +41,20 @@ public class CampaignController {
             ));
         }
     }
+
+    @PostMapping(value = "/{id}/thumbnail", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCampaignThumbnail(
+            @PathVariable java.util.UUID id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            Authentication authentication) {
+        try {
+            String imageUrl = campaignService.updateCampaignThumbnail(id, authentication.getName(), file);
+            return ResponseEntity.ok(java.util.Map.of(
+                    "message", "Thumbnail updated successfully!",
+                    "url", imageUrl
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }

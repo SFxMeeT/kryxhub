@@ -93,7 +93,13 @@
     		<groupId>com.stripe</groupId>
     		<artifactId>stripe-java</artifactId>
 			<version>32.1.0</version>
-			</dependency>
+		</dependency>
+
+		<dependency>
+    		<groupId>software.amazon.awssdk</groupId>
+    		<artifactId>s3</artifactId>
+    		<version>2.20.162</version>
+		</dependency>
 	</dependencies>
 
 	<build>

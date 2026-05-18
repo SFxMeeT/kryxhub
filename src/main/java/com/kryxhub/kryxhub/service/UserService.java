@@ -21,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,8 +44,9 @@ public class UserService {
     private final EmailService emailService;
     private final SubmissionRepository submissionRepository;
     private final CampaignRepository campaignRepository;
+    private final S3StorageService s3StorageService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService, RefreshTokenService refreshTokenService, OtpService otpService, EmailService emailService, SubmissionRepository submissionRepository, CampaignRepository campaignRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService, RefreshTokenService refreshTokenService, OtpService otpService, EmailService emailService, SubmissionRepository submissionRepository, CampaignRepository campaignRepository, S3StorageService s3StorageService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
@@ -53,6 +55,7 @@ public class UserService {
         this.emailService = emailService;
         this.submissionRepository = submissionRepository;
         this.campaignRepository = campaignRepository;
+        this.s3StorageService = s3StorageService;
     }
 
     public AuthCookieAccess registerUser(RegisterRequest request) {
@@ -282,5 +285,18 @@ public class UserService {
         }
 
         return activityTracker;
+    }
+
+    @Transactional
+    public String updateProfilePicture(String email, org.springframework.web.multipart.MultipartFile file) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String imageUrl = s3StorageService.uploadFile(file, "profiles");
+
+        user.setProfilePicUrl(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
     }
 }
