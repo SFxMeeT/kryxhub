@@ -24,7 +24,7 @@ public class AnalyticsController {
             @RequestParam(defaultValue = "30_DAYS") String timeframe,
             @RequestParam(required = false) CampaignType campaignType) {
 
-        String creatorEmail = jwt.getClaimAsString("email");
+        String creatorEmail = jwt.getSubject();
         
         CreatorAnalyticsDto analytics = analyticsService.getCreatorAnalytics(creatorEmail, timeframe, campaignType);
         

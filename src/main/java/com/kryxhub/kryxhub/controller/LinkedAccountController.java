@@ -28,7 +28,7 @@ public class LinkedAccountController {
     public ResponseEntity<List<LinkedAccountsResponseDto>> getLinkedAccountsUi(
             @AuthenticationPrincipal Jwt jwt) {
 
-        String userEmail = jwt.getClaimAsString("email");
+        String userEmail = jwt.getSubject();
         
         List<LinkedAccountsResponseDto> response = linkedAccountService.getGroupedLinkedAccounts(userEmail);
         
@@ -40,7 +40,7 @@ public class LinkedAccountController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID accountId) {
 
-        String userEmail = jwt.getClaimAsString("email");
+        String userEmail = jwt.getSubject();
 
         String responseMessage = linkedAccountService.unlinkAccount(accountId, userEmail);
         
