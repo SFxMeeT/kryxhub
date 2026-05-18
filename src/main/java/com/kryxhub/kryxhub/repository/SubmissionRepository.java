@@ -51,5 +51,25 @@ public interface SubmissionRepository extends JpaRepository<SubmissionEntity, UU
             @Param("startDate") OffsetDateTime startDate,
             @Param("campaignType") CampaignType campaignType
     );
+
+    @Query(
+        "SELECT s FROM SubmissionEntity s " +
+        "WHERE s.campaign.funder.email = :funderEmail " +
+        "AND s.submittedAt >= :startDate"
+    )
+    List<SubmissionEntity> findFunderMetricsSubmissions(
+            @Param("funderEmail") String funderEmail,
+            @Param("startDate") OffsetDateTime startDate
+    );
+
+    @Query("SELECT s FROM SubmissionEntity s " +
+           "WHERE s.campaign.funder.email = :funderEmail " +
+           "AND s.submittedAt >= :startDate " +
+           "AND (:campaignType IS NULL OR s.campaign.type = :campaignType)")
+    List<SubmissionEntity> findFunderAnalyticsSubmissions(
+            @Param("funderEmail") String funderEmail,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("campaignType") CampaignType campaignType
+    );
     
 }
