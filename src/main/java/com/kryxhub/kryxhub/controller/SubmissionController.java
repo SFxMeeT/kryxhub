@@ -112,7 +112,13 @@ public class SubmissionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        String creatorEmail = jwt.getClaimAsString("email");
+                String creatorEmail = jwt.getClaimAsString("email");
+                if (creatorEmail == null) {
+                    creatorEmail = jwt.getSubject();
+                }
+                
+                System.out.println("DEBUG - Extracted Email for Query: " + creatorEmail);
+
         return ResponseEntity.ok(submissionService.getCreatorSubmissionsFeed(
                 creatorEmail, status, campaignId, campaignType, sortBy, page, size));
     }
