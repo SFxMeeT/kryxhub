@@ -65,7 +65,7 @@ public class SubmissionEntity {
     @Column(name = "likes", nullable = false)
     private Integer currentLikes = 0;
 
-    @Column(name = "commets", nullable = false)
+    @Column(name = "comments", nullable = false)
     private Integer currentComments = 0;
 
     @Column(name = "shares", nullable = false)
