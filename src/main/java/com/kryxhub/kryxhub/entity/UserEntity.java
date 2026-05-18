@@ -1,6 +1,7 @@
 package com.kryxhub.kryxhub.entity;
 
 import com.kryxhub.kryxhub.enums.AccountStatus;
+import com.kryxhub.kryxhub.enums.PrimaryPersona;
 import com.kryxhub.kryxhub.enums.Role;
 import jakarta.persistence.*;
 
@@ -40,8 +41,8 @@ public class UserEntity {
     private Role role = Role.USER;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "primary_persona", nullable = false, length = 20)
-    private com.kryxhub.kryxhub.enums.PrimaryPersona primaryPersona = com.kryxhub.kryxhub.enums.PrimaryPersona.GENERAL;
+    @Column(name = "primary_persona", nullable = false, length = 20, columnDefinition = "varchar(20) default 'GENERAL'")
+    private PrimaryPersona primaryPersona = PrimaryPersona.GENERAL;
 
     @Column(name = "display_name", nullable = false, length = 100)
     private String displayName;
@@ -181,7 +182,7 @@ public class UserEntity {
         return primaryPersona;
     }
 
-    public void setPrimaryPersona(com.kryxhub.kryxhub.enums.PrimaryPersona primaryPersona) {
+    public void setPrimaryPersona(PrimaryPersona primaryPersona) {
         this.primaryPersona = primaryPersona;
     }
 
