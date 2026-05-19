@@ -3,6 +3,8 @@ package com.kryxhub.kryxhub.user.controller;
 import com.kryxhub.kryxhub.user.dto.LinkedAccountsResponseDto;
 import com.kryxhub.kryxhub.user.service.LinkedAccountService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
+@Tag(name = "2.1 Linked Social Accounts", description = "Manage connected YouTube, Twitch, Reddit, and Vimeo accounts")
 public class LinkedAccountController {
 
     private final LinkedAccountService linkedAccountService;

@@ -12,6 +12,8 @@ import com.kryxhub.kryxhub.user.dto.Verify2faEnableRequest;
 import com.kryxhub.kryxhub.user.dto.VerifyEmailChangeRequest;
 import com.kryxhub.kryxhub.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "2. Users & Identity", description = "User profiles, 2FA, and account settings")
 public class UserController {
 
     private final UserService userService;

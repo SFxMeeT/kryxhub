@@ -15,8 +15,11 @@ import com.kryxhub.kryxhub.campaign.dto.CreateCampaignRequest;
 import com.kryxhub.kryxhub.campaign.entity.CampaignEntity;
 import com.kryxhub.kryxhub.campaign.service.CampaignService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/campaigns")
+@Tag(name = "3. Campaigns", description = "Funder campaign creation, management, and discovery")
 public class CampaignController {
 
     private final CampaignService campaignService;

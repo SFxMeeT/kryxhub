@@ -3,6 +3,8 @@ package com.kryxhub.kryxhub.communication.controller;
 import com.kryxhub.kryxhub.communication.dto.NotificationDto;
 import com.kryxhub.kryxhub.communication.service.NotificationService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
+@Tag(name = "7. Communications", description = "In-app notifications and support tickets")
 public class NotificationController {
 
     private final NotificationService notificationService;

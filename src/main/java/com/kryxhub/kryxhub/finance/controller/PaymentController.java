@@ -6,11 +6,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.kryxhub.kryxhub.finance.service.StripePaymentService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payments")
+@Tag(name = "6. Finance & Payouts", description = "Stripe checkout, wallet funding, and creator transfers")
 public class PaymentController {
 
     private final StripePaymentService stripePaymentService;

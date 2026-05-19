@@ -35,7 +35,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/webhooks/**").permitAll();
-                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns/ui/**", "/api/users/ui/**", "/api/funders/ui/**", "/utils/password", "/login.html", "/error").permitAll();
+                    auth.requestMatchers("/api/auth/**", "/public/**", "/api/campaigns/ui/**", "/api/users/ui/**", "/api/funders/ui/**", "/utils/password", "/error").permitAll();
+                    auth.requestMatchers("/login.html", "/onboarding-complete.html", "/payment-cancelled.html", "/payment-success.html").permitAll();
+                    auth.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     auth.requestMatchers("/api/admin/**").hasAuthority("SCOPE_ROLE_ADMIN");
                     auth.anyRequest().authenticated();
                 })

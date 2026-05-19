@@ -4,6 +4,8 @@ import com.kryxhub.kryxhub.admin.dto.AdminUserDto;
 import com.kryxhub.kryxhub.analytics.dto.UserActivityDto;
 import com.kryxhub.kryxhub.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/users")
+@Tag(name = "8. Admin & Moderation", description = "Internal platform management tools for KryxHub staff")
 public class AdminUserController {
 
     private final UserService userService;

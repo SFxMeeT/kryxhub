@@ -8,6 +8,8 @@ import com.kryxhub.kryxhub.submission.entity.SubmissionEntity;
 import com.kryxhub.kryxhub.submission.enums.SubmissionStatus;
 import com.kryxhub.kryxhub.submission.service.SubmissionService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/submissions")
+@Tag(name = "4. Submissions", description = "Creator video submissions and funder reviews")
 public class SubmissionController {
 
     private final SubmissionService submissionService;

@@ -3,6 +3,8 @@ package com.kryxhub.kryxhub.admin.controller;
 import com.kryxhub.kryxhub.communication.enums.TicketStatus;
 import com.kryxhub.kryxhub.communication.service.SupportTicketService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/tickets")
+@Tag(name = "8. Admin & Moderation", description = "Internal platform management tools for KryxHub staff")
 public class AdminTicketController {
 
     private final SupportTicketService ticketService;

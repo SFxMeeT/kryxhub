@@ -12,6 +12,7 @@ import com.kryxhub.kryxhub.core.exception.Requires2faException;
 
 import com.kryxhub.kryxhub.user.dto.Verify2faLoginRequest;
 import com.kryxhub.kryxhub.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "1. Auth & Security", description = "Authentication, registration, and password management")
 public class AuthController {
 
     private final AuthService authService;
@@ -101,7 +103,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
-
+    
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {

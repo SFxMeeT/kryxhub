@@ -4,6 +4,8 @@ import com.kryxhub.kryxhub.admin.dto.AdminPayoutDto;
 import com.kryxhub.kryxhub.admin.dto.AdminRevenueDto;
 import com.kryxhub.kryxhub.finance.service.PayoutService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/api/admin/finance")
+@Tag(name = "8. Admin & Moderation", description = "Internal platform management tools for KryxHub staff")
 public class AdminFinancialController {
 
     private final PayoutService payoutService;

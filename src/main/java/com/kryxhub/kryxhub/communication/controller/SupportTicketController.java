@@ -3,6 +3,8 @@ package com.kryxhub.kryxhub.communication.controller;
 import com.kryxhub.kryxhub.communication.dto.SupportTicketDto;
 import com.kryxhub.kryxhub.communication.service.SupportTicketService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tickets")
+@Tag(name = "7. Communications")
 public class SupportTicketController {
 
     private final SupportTicketService ticketService;

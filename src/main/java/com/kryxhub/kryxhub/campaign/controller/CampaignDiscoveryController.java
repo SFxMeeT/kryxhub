@@ -6,12 +6,15 @@ import com.kryxhub.kryxhub.campaign.enums.CampaignType;
 import com.kryxhub.kryxhub.campaign.enums.Platforms;
 import com.kryxhub.kryxhub.campaign.service.CampaignService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/campaigns")
+@Tag(name = "3. Campaigns", description = "Funder campaign creation, management, and discovery")
 public class CampaignDiscoveryController {
 
     private final CampaignService campaignService;

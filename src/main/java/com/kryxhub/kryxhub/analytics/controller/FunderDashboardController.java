@@ -4,6 +4,8 @@ import com.kryxhub.kryxhub.analytics.dto.FunderCampaignCardDto;
 import com.kryxhub.kryxhub.analytics.dto.FunderMetricsDto;
 import com.kryxhub.kryxhub.analytics.service.FunderDashboardService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/funders/ui/dashboard")
+@Tag(name = "5. Analytics & Dashboards", description = "Metrics and data visualization for creators and funders")
 public class FunderDashboardController {
 
     private final FunderDashboardService dashboardService;

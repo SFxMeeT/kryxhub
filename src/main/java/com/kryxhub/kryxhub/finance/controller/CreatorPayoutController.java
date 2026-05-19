@@ -5,6 +5,8 @@ import com.kryxhub.kryxhub.finance.service.StripeConnectService;
 import com.kryxhub.kryxhub.user.entity.UserEntity;
 import com.kryxhub.kryxhub.user.repository.UserRepository;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payouts")
+@Tag(name = "6. Finance & Payouts", description = "Stripe checkout, wallet funding, and creator transfers")
 public class CreatorPayoutController {
 
     private final StripeConnectService stripeConnectService;

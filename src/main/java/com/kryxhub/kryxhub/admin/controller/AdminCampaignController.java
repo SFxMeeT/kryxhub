@@ -3,6 +3,8 @@ package com.kryxhub.kryxhub.admin.controller;
 import com.kryxhub.kryxhub.admin.dto.AdminCampaignDto;
 import com.kryxhub.kryxhub.campaign.service.CampaignService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/campaigns")
+@Tag(name = "8. Admin & Moderation", description = "Internal platform management tools for KryxHub staff")
 public class AdminCampaignController {
 
     private final CampaignService campaignService;
