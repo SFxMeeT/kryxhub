@@ -1,0 +1,19 @@
+package com.kryxhub.kryxhub.user.repository;
+
+import com.kryxhub.kryxhub.campaign.enums.Platforms;
+import com.kryxhub.kryxhub.user.entity.LinkedSocialAccountEntity;
+import com.kryxhub.kryxhub.user.entity.UserEntity;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
+
+@Repository
+public interface LinkedSocialAccountRepository extends JpaRepository<LinkedSocialAccountEntity, UUID> {
+
+    boolean existsByUserAndPlatformAndIsVerified(UserEntity user, Platforms platform, Boolean isVerified);
+
+    java.util.List<LinkedSocialAccountEntity> findByUserEmail(String email);
+
+}
