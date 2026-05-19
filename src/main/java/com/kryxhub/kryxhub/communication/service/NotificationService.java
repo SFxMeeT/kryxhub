@@ -48,7 +48,7 @@ public class NotificationService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return notificationRepository.findByUser(user, pageable); // Make sure this exists in your Repo!
+        return notificationRepository.findByUser(user, pageable);
     }
 
     @Transactional

@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByEmail(String email);
 
     @Query(
-        "SELECT new com.kryxhub.kryxhub.dto.TopFunderDto(" +
+        "SELECT new TopFunderDto(" +
         "u.id, u.profilePicUrl, u.displayName, u.bio, COUNT(c)) " +
         "FROM UserEntity u JOIN u.campaigns c " +
         // WHERE c.status = 'ACTIVE'

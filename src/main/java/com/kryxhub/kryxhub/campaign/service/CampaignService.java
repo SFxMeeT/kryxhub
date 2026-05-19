@@ -7,10 +7,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -221,7 +223,7 @@ public class CampaignService {
         ));
     }
 
-    public String forceCloseCampaign(java.util.UUID campaignId) {
+    public String forceCloseCampaign(UUID campaignId) {
         CampaignEntity campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new RuntimeException("Campaign not found."));
 
@@ -236,14 +238,14 @@ public class CampaignService {
         return "Campaign successfully force-closed. All future payouts have been halted.";
     }
 
-    public String overrideCampaignStatus(java.util.UUID campaignId, String newStatus) {
+    public String overrideCampaignStatus(UUID campaignId, String newStatus) {
         CampaignEntity campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new RuntimeException("Campaign not found."));
 
         String formattedStatus = newStatus.toUpperCase();
         String oldStatus = campaign.getStatus();
 
-        if ("ACTIVE".equals(formattedStatus) && campaign.getBudgetRemaining().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+        if ("ACTIVE".equals(formattedStatus) && campaign.getBudgetRemaining().compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Cannot activate a campaign that has no budget remaining.");
         }
 
@@ -255,7 +257,7 @@ public class CampaignService {
     }
 
     @Transactional
-    public String updateCampaignThumbnail(java.util.UUID campaignId, String funderEmail, org.springframework.web.multipart.MultipartFile file) {
+    public String updateCampaignThumbnail(UUID campaignId, String funderEmail, MultipartFile file) {
         CampaignEntity campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));
 
@@ -272,7 +274,7 @@ public class CampaignService {
     }
 
     private String calculateTimeAgo(OffsetDateTime createdAt) {
-        long minutes = java.time.temporal.ChronoUnit.MINUTES.between(createdAt, OffsetDateTime.now());
+        long minutes = ChronoUnit.MINUTES.between(createdAt, OffsetDateTime.now());
         if (minutes < 60) return minutes + " minutes ago";
         long hours = minutes / 60;
         if (hours < 24) return hours + " hours ago";
@@ -287,7 +289,7 @@ public class CampaignService {
                 "ACTIVE", BigDecimal.ZERO, pageable);
 
         return campaigns.map(c -> {
-            java.util.List<String> platformNames = c.getPlatforms().stream()
+            List<String> platformNames = c.getPlatforms().stream()
                     .map(p -> p.getPlatformName().name())
                     .toList();
 
@@ -318,14 +320,14 @@ public class CampaignService {
         });
     }
 
-    private String formatDate(java.time.OffsetDateTime date) {
+    private String formatDate(OffsetDateTime date) {
         if (date == null) return "N/A";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
         return date.format(formatter);
     }
 
     @Transactional(readOnly = true)
-    public CampaignDetailsDto getCampaignDetails(java.util.UUID campaignId) {
+    public CampaignDetailsDto getCampaignDetails(UUID campaignId) {
         
         CampaignEntity campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));

@@ -132,7 +132,7 @@ public class PayoutService {
             
             payoutRepository.save(ledger);
 
-            System.out.println("✅ Processed automated payout for " + submission.getVideoTitle() + "! Transfer ID: " + transferId);
+            System.out.println("Processed automated payout for " + submission.getVideoTitle() + "! Transfer ID: " + transferId);
 
         } catch (Exception e) {
             throw new RuntimeException("Stripe Transfer Failed, rolling back database: " + e.getMessage());
@@ -227,7 +227,7 @@ public class PayoutService {
         int newTotalViews = previousViews + simulatedAddedViews;
 
         BigDecimal viewsInThousands = BigDecimal.valueOf(simulatedAddedViews)
-                .divide(BigDecimal.valueOf(1000), 4, java.math.RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(1000), 4, RoundingMode.HALF_UP);
         BigDecimal newlyEarnedAmount = viewsInThousands.multiply(platformRules.getCpmRate());
 
         if (newlyEarnedAmount.compareTo(BigDecimal.ZERO) <= 0) {

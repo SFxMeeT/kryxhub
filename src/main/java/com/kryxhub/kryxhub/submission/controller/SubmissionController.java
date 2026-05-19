@@ -11,6 +11,7 @@ import com.kryxhub.kryxhub.submission.service.SubmissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kryxhub.kryxhub.campaign.enums.CampaignType;
 
@@ -85,7 +86,7 @@ public class SubmissionController {
     public ResponseEntity<?> uploadAnswerImage(
             @PathVariable UUID submissionId,
             @PathVariable UUID answerId,
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam("file") MultipartFile file,
             Authentication authentication) {
         try {
             String imageUrl = submissionService.uploadAnswerImage(submissionId, answerId, authentication.getName(), file);

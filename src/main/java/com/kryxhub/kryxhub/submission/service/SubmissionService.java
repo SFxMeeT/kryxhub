@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kryxhub.kryxhub.campaign.entity.CampaignEntity;
 import com.kryxhub.kryxhub.campaign.entity.CampaignQuestionEntity;
@@ -160,7 +161,7 @@ public class SubmissionService {
     }
 
     @Transactional
-    public String uploadAnswerImage(java.util.UUID submissionId, java.util.UUID answerId, String creatorEmail, org.springframework.web.multipart.MultipartFile file) {
+    public String uploadAnswerImage(UUID submissionId, UUID answerId, String creatorEmail, MultipartFile file) {
         
         SubmissionEntity submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
@@ -205,7 +206,7 @@ public class SubmissionService {
         return submissions.map(s -> {
 
             int minViews = s.getCampaign().getPlatforms().stream()
-                    .filter(p -> p.getPlatformName().name().equals(s.getPlatformName()))
+                    .filter(p -> p.getPlatformName().name().equals(s.getPlatformName().name()))
                     .findFirst()
                     .map(p -> {
                         if (p.getCpmRate().compareTo(BigDecimal.ZERO) == 0) return 0;
@@ -233,7 +234,7 @@ public class SubmissionService {
         }
 
         var platformOpt = s.getCampaign().getPlatforms().stream()
-                .filter(p -> p.getPlatformName().name().equals(s.getPlatformName())).findFirst();
+                .filter(p -> p.getPlatformName().name().equals(s.getPlatformName().name())).findFirst();
 
         int minViews = platformOpt.map(p -> {
             if (p.getCpmRate().compareTo(BigDecimal.ZERO) == 0) return 0;

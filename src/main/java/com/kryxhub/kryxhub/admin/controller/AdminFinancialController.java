@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,31 +51,31 @@ public class AdminFinancialController {
     }
 
     @PostMapping("/retry-transfer/{payoutId}")
-    public ResponseEntity<?> retryFailedTransfer(@PathVariable java.util.UUID payoutId) {
+    public ResponseEntity<?> retryFailedTransfer(@PathVariable UUID payoutId) {
         try {
             String resultMessage = payoutService.retryFailedTransfer(payoutId);
-            return ResponseEntity.ok(java.util.Map.of(
+            return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", resultMessage
             ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @PostMapping("/force-payout/{submissionId}")
     public ResponseEntity<?> forceManualPayout(
-            @PathVariable java.util.UUID submissionId, 
+            @PathVariable UUID submissionId, 
             @RequestParam(defaultValue = "1000") int simulatedAddedViews) {
         try {
             String resultMessage = payoutService.triggerManualAdminPayout(submissionId, simulatedAddedViews);
             
-            return ResponseEntity.ok(java.util.Map.of(
+            return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", resultMessage
             ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

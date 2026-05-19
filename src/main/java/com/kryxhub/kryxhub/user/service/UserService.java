@@ -25,6 +25,7 @@ import com.kryxhub.kryxhub.user.dto.Verify2faEnableRequest;
 import com.kryxhub.kryxhub.user.dto.VerifyEmailChangeRequest;
 import com.kryxhub.kryxhub.user.entity.UserEntity;
 import com.kryxhub.kryxhub.user.enums.AccountStatus;
+import com.kryxhub.kryxhub.user.enums.PrimaryPersona;
 import com.kryxhub.kryxhub.user.enums.Role;
 import com.kryxhub.kryxhub.user.repository.UserRepository;
 
@@ -36,6 +37,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -276,7 +278,7 @@ public class UserService {
 
         UserActivityDto activityTracker = new UserActivityDto(user.getUsername(), user.getPrimaryPersona().name());
 
-        if (user.getPrimaryPersona() == com.kryxhub.kryxhub.user.enums.PrimaryPersona.FUNDER) {
+        if (user.getPrimaryPersona() == PrimaryPersona.FUNDER) {
             
             List<CampaignEntity> userCampaigns = campaignRepository.findByFunder(user);
             
@@ -287,7 +289,7 @@ public class UserService {
                     
             activityTracker.setCampaigns(campaignDtos);
             
-        } else if (user.getPrimaryPersona() == com.kryxhub.kryxhub.user.enums.PrimaryPersona.CREATOR) {
+        } else if (user.getPrimaryPersona() == PrimaryPersona.CREATOR) {
             
             List<SubmissionEntity> userSubmissions = submissionRepository.findByCreator(user);
             
@@ -303,7 +305,7 @@ public class UserService {
     }
 
     @Transactional
-    public String updateProfilePicture(String email, org.springframework.web.multipart.MultipartFile file) {
+    public String updateProfilePicture(String email, MultipartFile file) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

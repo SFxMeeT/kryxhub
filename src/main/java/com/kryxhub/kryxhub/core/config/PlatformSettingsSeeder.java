@@ -23,7 +23,7 @@ public class PlatformSettingsSeeder implements CommandLineRunner {
             defaultSettings.setId(1L);
             defaultSettings.setPlatformFeeRate(new BigDecimal("0.10"));
             settingsRepository.save(defaultSettings);
-            System.out.println("⚙️ Default Platform Settings initialized (Fee: 10%)");
+            System.out.println("Default Platform Settings initialized (Fee: 10%)");
         }
     }
 }

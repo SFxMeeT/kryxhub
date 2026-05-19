@@ -4,6 +4,9 @@ import com.kryxhub.kryxhub.admin.dto.AdminUserDto;
 import com.kryxhub.kryxhub.analytics.dto.UserActivityDto;
 import com.kryxhub.kryxhub.user.service.UserService;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,20 +31,20 @@ public class AdminUserController {
     }
     
     @PutMapping("/{userId}/suspend")
-    public ResponseEntity<?> toggleSuspendUser(@PathVariable java.util.UUID userId) {
+    public ResponseEntity<?> toggleSuspendUser(@PathVariable UUID userId) {
         try {
             String resultMessage = userService.toggleUserSuspension(userId);
-            return ResponseEntity.ok(java.util.Map.of(
+            return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", resultMessage
             ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @GetMapping("/{userId}/activity")
-    public ResponseEntity<UserActivityDto> getUserActivity(@PathVariable java.util.UUID userId) {
+    public ResponseEntity<UserActivityDto> getUserActivity(@PathVariable UUID userId) {
         try {
             UserActivityDto activity = userService.getUserActivityTracker(userId);
             return ResponseEntity.ok(activity);

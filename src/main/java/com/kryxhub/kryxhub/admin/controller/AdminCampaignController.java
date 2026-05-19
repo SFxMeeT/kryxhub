@@ -3,6 +3,9 @@ package com.kryxhub.kryxhub.admin.controller;
 import com.kryxhub.kryxhub.admin.dto.AdminCampaignDto;
 import com.kryxhub.kryxhub.campaign.service.CampaignService;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
@@ -28,7 +31,7 @@ public class AdminCampaignController {
     }
 
     @PutMapping("/{campaignId}/force-close")
-    public ResponseEntity<?> forceCloseCampaign(@PathVariable java.util.UUID campaignId) {
+    public ResponseEntity<?> forceCloseCampaign(@PathVariable UUID campaignId) {
         try {
             String resultMessage = campaignService.forceCloseCampaign(campaignId);
             return ResponseEntity.ok(java.util.Map.of(
@@ -42,16 +45,16 @@ public class AdminCampaignController {
 
     @PutMapping("/{campaignId}/override-status")
     public ResponseEntity<?> overrideCampaignStatus(
-            @PathVariable java.util.UUID campaignId, 
+            @PathVariable UUID campaignId, 
             @RequestParam String newStatus) {
         try {
             String resultMessage = campaignService.overrideCampaignStatus(campaignId, newStatus);
-            return ResponseEntity.ok(java.util.Map.of(
+            return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", resultMessage
             ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

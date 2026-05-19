@@ -5,6 +5,8 @@ import com.kryxhub.kryxhub.communication.service.SupportTicketService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +26,6 @@ public class AdminTicketController {
             @RequestParam(required = false) String resolutionNote) {
         
         String result = ticketService.updateTicketStatus(ticketId, newStatus, resolutionNote);
-        return ResponseEntity.ok(java.util.Map.of("message", result));
+        return ResponseEntity.ok(Map.of("message", result));
     }
 }

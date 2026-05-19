@@ -4,9 +4,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
+import java.util.UUID;
 
 import com.kryxhub.kryxhub.analytics.dto.OverviewFeedDto;
+import com.kryxhub.kryxhub.campaign.dto.CampaignDetailsDto;
 import com.kryxhub.kryxhub.campaign.dto.CreateCampaignRequest;
 import com.kryxhub.kryxhub.campaign.entity.CampaignEntity;
 import com.kryxhub.kryxhub.campaign.service.CampaignService;
@@ -47,7 +51,7 @@ public class CampaignController {
     @PostMapping(value = "/{id}/thumbnail", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCampaignThumbnail(
             @PathVariable java.util.UUID id,
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam("file") MultipartFile file,
             Authentication authentication) {
         try {
             String imageUrl = campaignService.updateCampaignThumbnail(id, authentication.getName(), file);
@@ -68,10 +72,10 @@ public class CampaignController {
     }
 
     @GetMapping("/ui/{campaignId}/details")
-    public ResponseEntity<com.kryxhub.kryxhub.campaign.dto.CampaignDetailsDto> getCampaignUIDetails(
-            @PathVariable java.util.UUID campaignId) {
+    public ResponseEntity<CampaignDetailsDto> getCampaignUIDetails(
+            @PathVariable UUID campaignId) {
         
-        com.kryxhub.kryxhub.campaign.dto.CampaignDetailsDto details = campaignService.getCampaignDetails(campaignId);
+        CampaignDetailsDto details = campaignService.getCampaignDetails(campaignId);
         return ResponseEntity.ok(details);
     }
 }

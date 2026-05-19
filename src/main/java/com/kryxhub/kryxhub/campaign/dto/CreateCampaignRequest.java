@@ -70,8 +70,6 @@ public class CreateCampaignRequest {
     public List<QuestionDto> getQuestions() { return questions; }
     public void setQuestions(List<QuestionDto> questions) { this.questions = questions; }
 
-    // --- Nested Classes ---
-
     public static class PlatformDto {
         private Platforms platformName;
         private BigDecimal cpmRate;

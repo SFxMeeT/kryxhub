@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.stripe.model.checkout.Session;
 
 @RestController
 @RequestMapping("/api/webhooks")
@@ -43,12 +44,12 @@ public class StripeWebhookController {
 
         if ("checkout.session.completed".equals(event.getType())) {
             EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-            com.stripe.model.checkout.Session stripeSession = null;
+            Session stripeSession = null;
 
             if (dataObjectDeserializer.getObject().isPresent()) {
-                stripeSession = (com.stripe.model.checkout.Session) dataObjectDeserializer.getObject().get();
+                stripeSession = (Session) dataObjectDeserializer.getObject().get();
             } else {
-                stripeSession = (com.stripe.model.checkout.Session) dataObjectDeserializer.deserializeUnsafe();
+                stripeSession = (Session) dataObjectDeserializer.deserializeUnsafe();
             }
 
             if (stripeSession != null && stripeSession.getMetadata() != null) {
@@ -76,7 +77,7 @@ public class StripeWebhookController {
         }
 
         if ("transfer.failed".equals(event.getType())) {
-            System.out.println("⚠️ A transfer to a creator failed! Event ID: " + event.getId());
+            System.out.println("A transfer to a creator failed! Event ID: " + event.getId());
         }
 
         return ResponseEntity.ok("Success");

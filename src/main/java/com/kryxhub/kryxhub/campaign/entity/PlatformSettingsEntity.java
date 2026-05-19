@@ -13,7 +13,6 @@ public class PlatformSettingsEntity {
     @Column(nullable = false, precision = 5, scale = 4)
     private BigDecimal platformFeeRate = new BigDecimal("0.10");
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public BigDecimal getPlatformFeeRate() { return platformFeeRate; }

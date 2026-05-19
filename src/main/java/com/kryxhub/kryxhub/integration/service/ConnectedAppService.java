@@ -18,7 +18,7 @@ public class ConnectedAppService {
 
     private final UserRepository userRepository;
     private final LinkedSocialAccountRepository linkedSocialAccountRepository;
-    private final PlatformVerificationService platformVerificationService; // Inject the Router!
+    private final PlatformVerificationService platformVerificationService;
 
     public ConnectedAppService(UserRepository userRepository,
                                LinkedSocialAccountRepository linkedSocialAccountRepository,
