@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.kryxhub.kryxhub.campaign.enums.Platforms;
 import com.kryxhub.kryxhub.submission.dto.VideoStatsDto;
 import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,7 @@ public class TwitchApiService implements PlatformApiService {
     private String clientSecret;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Platforms getPlatform() {
@@ -33,30 +35,37 @@ public class TwitchApiService implements PlatformApiService {
 
     @Override
     public VideoStatsDto fetchVideoStats(String videoUrl) {
-        String videoId = extractTwitchId(videoUrl);
-        if (videoId == null) throw new RuntimeException("Invalid Twitch URL");
 
-        String tokenUrl = String.format("https://id.twitch.tv/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials", clientId, clientSecret);
-        JsonNode tokenResponse = restTemplate.postForObject(tokenUrl, null, JsonNode.class);
-        String accessToken = tokenResponse.get("access_token").asText();
+        try {
 
-        String apiUrl = "https://api.twitch.tv/helix/videos?id=" + videoId;
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Client-Id", clientId);
-        headers.set("Authorization", "Bearer " + accessToken);
-        
-        ResponseEntity<JsonNode> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), JsonNode.class);
-        JsonNode body = response.getBody();
+            String videoId = extractTwitchId(videoUrl);
+            if (videoId == null) throw new RuntimeException("Invalid Twitch URL");
 
-        if (body != null && body.has("data") && body.get("data").size() > 0) {
-            JsonNode videoData = body.get("data").get(0);
-            String title = videoData.get("title").asText();
-            int views = videoData.get("view_count").asInt();
-            OffsetDateTime publishedAt = OffsetDateTime.parse(videoData.get("created_at").asText());
+            String tokenUrl = String.format("https://id.twitch.tv/oauth2/token?client_id=%s&client_secret=%s&grant_type=client_credentials", clientId, clientSecret);
+            JsonNode tokenResponse = restTemplate.postForObject(tokenUrl, null, JsonNode.class);
+            String accessToken = tokenResponse.get("access_token").asText();
 
-            return new VideoStatsDto(title, views, publishedAt);
+            String apiUrl = "https://api.twitch.tv/helix/videos?id=" + videoId;
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Client-Id", clientId);
+            headers.set("Authorization", "Bearer " + accessToken);
+            
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+            JsonNode body = objectMapper.readTree(response.getBody());
+
+            if (body != null && body.has("data") && body.get("data").size() > 0) {
+                JsonNode videoData = body.get("data").get(0);
+                String title = videoData.get("title").asText();
+                int views = videoData.get("view_count").asInt();
+                OffsetDateTime publishedAt = OffsetDateTime.parse(videoData.get("created_at").asText());
+
+                return new VideoStatsDto(title, views, publishedAt);
+            }
+            throw new RuntimeException("Could not fetch Twitch data");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing Twitch API: " + e.getMessage());
         }
-        throw new RuntimeException("Could not fetch Twitch data");
     }
 
     private String extractTwitchId(String url) {

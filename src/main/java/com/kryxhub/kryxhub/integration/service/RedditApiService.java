@@ -3,6 +3,7 @@ package com.kryxhub.kryxhub.integration.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kryxhub.kryxhub.campaign.enums.Platforms;
 import com.kryxhub.kryxhub.submission.dto.VideoStatsDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 public class RedditApiService implements PlatformApiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Platforms getPlatform() {
@@ -28,30 +30,38 @@ public class RedditApiService implements PlatformApiService {
 
     @Override
     public VideoStatsDto fetchVideoStats(String videoUrl) {
-
-        String postId = extractRedditId(videoUrl);
-        if (postId == null) throw new RuntimeException("Invalid Reddit URL");
-
-        String apiUrl = "https://www.reddit.com/comments/" + postId + ".json";;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent", "KryxHub-Backend/1.0 (Integration Testing)");
         
-        ResponseEntity<JsonNode> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), JsonNode.class);
-        JsonNode body = response.getBody();
+        try{
 
-        if (body != null && body.isArray() && body.size() > 0) {
-            JsonNode postData = body.get(0).get("data").get("children").get(0).get("data");
-            
-            String title = postData.get("title").asText();
-            int score = postData.get("score").asInt();
-            long createdUtc = postData.get("created_utc").asLong();
-            
-            OffsetDateTime publishedAt = Instant.ofEpochSecond(createdUtc).atOffset(ZoneOffset.UTC);
+            String postId = extractRedditId(videoUrl);
+            if (postId == null) throw new RuntimeException("Invalid Reddit URL");
 
-            return new VideoStatsDto(title, score, publishedAt);
+            String apiUrl = "https://www.reddit.com/comments/" + postId + ".json";;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "KryxHub-Backend/1.0 (Integration Testing)");
+            
+
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+            JsonNode body = objectMapper.readTree(response.getBody());
+
+            if (body != null && body.isArray() && body.size() > 0) {
+                JsonNode postData = body.get(0).get("data").get("children").get(0).get("data");
+                
+                String title = postData.get("title").asText();
+                int score = postData.get("score").asInt();
+                long createdUtc = postData.get("created_utc").asLong();
+                
+                OffsetDateTime publishedAt = Instant.ofEpochSecond(createdUtc).atOffset(ZoneOffset.UTC);
+
+                return new VideoStatsDto(title, score, publishedAt);
+            }
+            throw new RuntimeException("Could not fetch Reddit data");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing Reddit API: " + e.getMessage());
         }
-        throw new RuntimeException("Could not fetch Reddit data");
+        
     }
 
     private String extractRedditId(String url) {
