@@ -17,6 +17,8 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     Optional<UserEntity> findByEmail(String email);
 
+    boolean existsByUsername(String username);
+
     @Query("SELECT new com.kryxhub.kryxhub.analytics.dto.TopFunderDto(u.id, u.profilePicUrl, u.displayName, u.bio, COUNT(c)) " + "FROM UserEntity u JOIN u.campaigns c GROUP BY u.id, u.profilePicUrl, u.displayName, u.bio ORDER BY COUNT(c) DESC")
     List<TopFunderDto> findTopFunders(Pageable pageable);
 }
