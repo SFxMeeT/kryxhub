@@ -48,6 +48,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -74,6 +75,45 @@ public class UserService {
         this.s3StorageService = s3StorageService;
     }
 
+    private static final String[] COLORS = {
+        "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Brown", "Black", "White",
+        "Gray", "Cyan", "Magenta", "Maroon", "Olive", "Navy", "Teal", "Silver", "Gold", "Violet",
+        "Indigo", "Coral", "Salmon", "Khaki", "Plum", "Crimson", "Orchid", "Azure", "Ivory", "Ebony"
+    };
+
+    private static final String[] ANIMALS = {
+        "Lion", "Tiger", "Bear", "Elephant", "Leopard", "Cheetah", "Wolf", "Fox", "Dog", "Cat",
+        "Horse", "Cow", "Pig", "Sheep", "Goat", "Deer", "Monkey", "Kangaroo", "Zebra", "Giraffe",
+        "Rhino", "Hippo", "Camel", "Rabbit", "Mouse", "Rat", "Squirrel", "Bat", "Bird", "Eagle",
+        "Hawk", "Owl", "Penguin", "Ostrich", "Duck", "Goose", "Swan", "Chicken", "Turkey", "Fish",
+        "Shark", "Whale", "Dolphin", "Whale", "Octopus", "Seal", "Turtle", "Walrus", "Crab", "Squid",
+        "Dinosaur", "Dragon", "Unicorn", "Phoenix", "Griffin", "Pegasus", "Kraken", "Yeti", "Sphinx", "Hydra"
+    };
+
+    private final Random random = new Random();
+
+    private String generateUniqueFunUsername() {
+        String generatedUsername;
+        int maxRetries = 100;
+        int attempts = 0;
+
+        do {
+            String color = COLORS[random.nextInt(COLORS.length)];
+            String animal = ANIMALS[random.nextInt(ANIMALS.length)];
+            int number = 10 + random.nextInt(90); 
+            
+            generatedUsername = color + animal + number;
+            attempts++;
+
+            if (attempts >= maxRetries) {
+                return generatedUsername + UUID.randomUUID().toString().substring(0, 4);
+            }
+
+        } while (userRepository.existsByUsername(generatedUsername));
+
+        return generatedUsername;
+    }
+
     public AuthCookieAccess registerUser(RegisterRequest request) {
         Optional<UserEntity> existingUser = userRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
@@ -84,7 +124,9 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setDisplayName(request.getDisplayName());
-        user.setUsername(request.getEmail().split("@")[0] + UUID.randomUUID().toString().substring(0, 5));
+
+        user.setUsername(generateUniqueFunUsername()); 
+        
         user.setRole(Role.USER);
         user.setAccountStatus(AccountStatus.ACTIVE);
 
