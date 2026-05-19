@@ -53,7 +53,14 @@ public class VimeoApiService implements PlatformApiService {
     }
 
     private String extractVimeoId(String url) {
-        Matcher matcher = Pattern.compile("vimeo\\.com/(?:.*#|.*/videos/)?([0-9]+)").matcher(url);
-        return matcher.find() ? matcher.group(1) : null;
+        if (url == null || url.isEmpty()) return null;
+        
+        String regex = "vimeo\\.com\\/(?:.*\\/)?(\\d+)";
+        Matcher matcher = Pattern.compile(regex).matcher(url);
+        
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
