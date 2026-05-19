@@ -45,8 +45,14 @@ public class YouTubeApiService implements PlatformApiService {
     }
 
     private String extractYouTubeId(String url) {
-        String pattern = "(?<=watch\\?v=|/videos/|embed\\/|youtu.be\\/|\\/v\\/|\\/e\\/|watch\\?v%3D|watch\\?feature=player_embedded&v=|%2Fvideos%2F|embed%\u200C\u200B2F|youtu.be%2F|%2Fv%2F)[^#\\&\\?\\n]*";
-        Matcher matcher = Pattern.compile(pattern).matcher(url);
-        return matcher.find() ? matcher.group() : null;
+        if (url == null || url.isEmpty()) return null;
+        
+        String regex = "(?:youtu\\.be\\/|youtube\\.com\\/(?:embed\\/|v\\/|shorts\\/|live\\/|watch\\?v=|watch\\?.+&v=))([a-zA-Z0-9_-]{11})";
+        
+        Matcher matcher = Pattern.compile(regex).matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }

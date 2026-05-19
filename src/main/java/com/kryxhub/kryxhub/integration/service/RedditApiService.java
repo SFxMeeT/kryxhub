@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class RedditApiService implements PlatformApiService {
@@ -27,11 +29,10 @@ public class RedditApiService implements PlatformApiService {
     @Override
     public VideoStatsDto fetchVideoStats(String videoUrl) {
 
-        String cleanUrl = videoUrl.split("\\?")[0];
-        if (cleanUrl.endsWith("/")) {
-            cleanUrl = cleanUrl.substring(0, cleanUrl.length() - 1);
-        }
-        String apiUrl = cleanUrl + ".json";
+        String postId = extractRedditId(videoUrl);
+        if (postId == null) throw new RuntimeException("Invalid Reddit URL");
+
+        String apiUrl = "https://www.reddit.com/comments/" + postId + ".json";;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent", "KryxHub-Backend/1.0 (Integration Testing)");
@@ -51,5 +52,17 @@ public class RedditApiService implements PlatformApiService {
             return new VideoStatsDto(title, score, publishedAt);
         }
         throw new RuntimeException("Could not fetch Reddit data");
+    }
+
+    private String extractRedditId(String url) {
+        if (url == null || url.isEmpty()) return null;
+        
+        String regex = "(?:comments\\/|redd\\.it\\/)([a-zA-Z0-9]{5,9})";
+        Matcher matcher = Pattern.compile(regex).matcher(url);
+        
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }

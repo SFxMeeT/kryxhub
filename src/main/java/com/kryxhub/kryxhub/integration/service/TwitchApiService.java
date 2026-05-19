@@ -60,7 +60,14 @@ public class TwitchApiService implements PlatformApiService {
     }
 
     private String extractTwitchId(String url) {
-        Matcher matcher = Pattern.compile("videos/(\\d+)").matcher(url);
-        return matcher.find() ? matcher.group(1) : null;
+        if (url == null || url.isEmpty()) return null;
+        
+        String regex = "videos\\/(\\d+)";
+        Matcher matcher = Pattern.compile(regex).matcher(url);
+        
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
